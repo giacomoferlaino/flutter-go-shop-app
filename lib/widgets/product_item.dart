@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../models/product.dart';
+import '../providers/product.dart';
 import '../pages/product_detailt_page.dart';
 
 class ProductItem extends StatelessWidget {
-  final Product product;
-
-  ProductItem(this.product);
-
   @override
   Widget build(BuildContext context) {
+    final Product product = Provider.of<Product>(context);
     return Container(
       decoration: BoxDecoration(
           border: Border.all(width: 0.5),
@@ -20,8 +18,9 @@ class ProductItem extends StatelessWidget {
           footer: GridTileBar(
             backgroundColor: Colors.black87,
             leading: IconButton(
-              icon: Icon(Icons.favorite),
-              onPressed: () {},
+              icon: Icon(
+                  product.isFavorite ? Icons.favorite : Icons.favorite_border),
+              onPressed: product.toggleFavorite,
               color: Theme.of(context).accentColor,
             ),
             trailing: IconButton(

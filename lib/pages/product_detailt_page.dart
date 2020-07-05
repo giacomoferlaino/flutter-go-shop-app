@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_app/providers/products_provider.dart';
+import 'package:shop_app/providers/products.dart';
 
-import '../models/product.dart';
+import '../providers/product.dart';
 
 class ProductDetailPage extends StatelessWidget {
   static const String routeName = '/product-detail';
@@ -12,7 +12,7 @@ class ProductDetailPage extends StatelessWidget {
     final String productId =
         ModalRoute.of(context).settings.arguments as String;
     final Product loadedProduct =
-        Provider.of<ProductsProvider>(context).findById(productId);
+        Provider.of<Products>(context, listen: false).findById(productId);
     return Scaffold(
       appBar: AppBar(
         title: Text(loadedProduct.title),
