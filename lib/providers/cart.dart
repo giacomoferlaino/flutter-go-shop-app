@@ -4,10 +4,16 @@ import '../models/cart-item.dart';
 import '../providers/product.dart';
 
 class Cart with ChangeNotifier {
-  Map<String, CartItem> _items;
+  Map<String, CartItem> _items = {};
 
   Map<String, CartItem> get items {
     return {..._items};
+  }
+
+  int get itemsCount {
+    int count = 0;
+    _items.forEach((key, cartItem) => count += cartItem.quantity);
+    return count;
   }
 
   void addItem(Product product) {
@@ -29,5 +35,6 @@ class Cart with ChangeNotifier {
                 price: product.price,
               ));
     }
+    notifyListeners();
   }
 }
