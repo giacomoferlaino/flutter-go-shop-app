@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../models/cart-item.dart';
+import '../models/cart_item.dart';
 import '../providers/product.dart';
 
 class Cart with ChangeNotifier {
@@ -10,10 +10,14 @@ class Cart with ChangeNotifier {
     return {..._items};
   }
 
-  int get itemsCount {
+  int get totalQuantity {
     int count = 0;
     _items.forEach((_, cartItem) => count += cartItem.quantity);
     return count;
+  }
+
+  int get itemCount {
+    return _items.length;
   }
 
   double get totalAmount {
