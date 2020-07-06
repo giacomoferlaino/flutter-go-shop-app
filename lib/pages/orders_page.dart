@@ -5,6 +5,8 @@ import '../providers/orders.dart';
 import '../widgets/order_element.dart';
 
 class OrdersPage extends StatelessWidget {
+  static const String routeName = '/orders';
+
   @override
   Widget build(BuildContext context) {
     final Orders orderData = Provider.of<Orders>(context);
