@@ -50,8 +50,9 @@ class Products with ChangeNotifier {
     return _items.firstWhere((product) => product.id == id);
   }
 
-  void addProduct() {
-    // _items.add(newProduct);
+  void addProduct(Product product) {
+    final newProduct = product.clone(id: DateTime.now().toString());
+    _items.insert(0, newProduct);
     notifyListeners();
   }
 }
