@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../providers/product.dart';
+
 class EditProductPage extends StatefulWidget {
   static const String routeName = '/edit-product';
 
@@ -12,6 +14,9 @@ class _EditProductPageState extends State<EditProductPage> {
   final _descriptionFocusNode = FocusNode();
   final _imageUrlFocusNode = FocusNode();
   final _imageUrlController = TextEditingController();
+  final _form = GlobalKey<FormState>();
+  Product _editedProduct =
+      Product(id: null, title: '', price: 0, description: '', imageUrl: '');
 
   @override
   void initState() {
@@ -23,6 +28,16 @@ class _EditProductPageState extends State<EditProductPage> {
     if (!_imageUrlFocusNode.hasFocus) {
       setState(() {});
     }
+  }
+
+  void _saveForm() {
+    final bool isValid = _form.currentState.validate();
+    if (!isValid) return;
+    _form.currentState.save();
+    print(_editedProduct.title);
+    print(_editedProduct.description);
+    print(_editedProduct.price);
+    print(_editedProduct.imageUrl);
   }
 
   @override
@@ -40,19 +55,32 @@ class _EditProductPageState extends State<EditProductPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit product'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: _saveForm,
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(15),
         child: Form(
+          key: _form,
           child: ListView(
             children: <Widget>[
               TextFormField(
-                decoration: InputDecoration(labelText: 'Title'),
-                textInputAction: TextInputAction.next,
-                onFieldSubmitted: (_) {
-                  FocusScope.of(context).requestFocus(_priceFocusNode);
-                },
-              ),
+                  decoration: InputDecoration(labelText: 'Title'),
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) {
+                    FocusScope.of(context).requestFocus(_priceFocusNode);
+                  },
+                  validator: (value) {
+                    if (value.isEmpty) return 'Please insert a value';
+                    return null;
+                  },
+                  onSaved: (title) {
+                    _editedProduct = _editedProduct.clone(title: title);
+                  }),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Price'),
                 keyboardType: TextInputType.number,
@@ -61,12 +89,33 @@ class _EditProductPageState extends State<EditProductPage> {
                 onFieldSubmitted: (_) {
                   FocusScope.of(context).requestFocus(_descriptionFocusNode);
                 },
+                validator: (value) {
+                  if (value.isEmpty) return 'Please insert a value';
+                  try {
+                    double.parse(value);
+                  } catch (_) {
+                    return 'Please insert a valid price';
+                  }
+                  return null;
+                },
+                onSaved: (price) {
+                  _editedProduct =
+                      _editedProduct.clone(price: double.parse(price));
+                },
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Description'),
                 maxLines: 3,
                 keyboardType: TextInputType.multiline,
                 focusNode: _descriptionFocusNode,
+                validator: (value) {
+                  if (value.isEmpty) return 'Please insert a value';
+                  return null;
+                },
+                onSaved: (description) {
+                  _editedProduct =
+                      _editedProduct.clone(description: description);
+                },
               ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -101,6 +150,15 @@ class _EditProductPageState extends State<EditProductPage> {
                       textInputAction: TextInputAction.done,
                       controller: _imageUrlController,
                       focusNode: _imageUrlFocusNode,
+                      onFieldSubmitted: (_) => _saveForm(),
+                      validator: (value) {
+                        if (value.isEmpty) return 'Please insert a value';
+                        return null;
+                      },
+                      onSaved: (imageUrl) {
+                        _editedProduct =
+                            _editedProduct.clone(imageUrl: imageUrl);
+                      },
                     ),
                   ),
                 ],
