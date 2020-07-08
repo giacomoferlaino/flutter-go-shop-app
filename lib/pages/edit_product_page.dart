@@ -19,11 +19,26 @@ class _EditProductPageState extends State<EditProductPage> {
   final _form = GlobalKey<FormState>();
   Product _editedProduct =
       Product(id: null, title: '', price: 0, description: '', imageUrl: '');
+  bool _isInit = true;
 
   @override
   void initState() {
     super.initState();
     _imageUrlFocusNode.addListener(_updateImageUrl);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isInit) {
+      _isInit = false;
+      final String productId =
+          ModalRoute.of(context).settings.arguments as String;
+      if (productId == null) return;
+      _editedProduct =
+          Provider.of<Products>(context, listen: false).findById(productId);
+      _imageUrlController.text = _editedProduct.imageUrl;
+    }
   }
 
   void _updateImageUrl() {
@@ -36,7 +51,12 @@ class _EditProductPageState extends State<EditProductPage> {
     final bool isValid = _form.currentState.validate();
     if (!isValid) return;
     _form.currentState.save();
-    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    final Products products = Provider.of<Products>(context, listen: false);
+    if (_editedProduct.id != null) {
+      products.updateProduct(_editedProduct.id, _editedProduct);
+    } else {
+      products.addProduct(_editedProduct);
+    }
     Navigator.of(context).pop();
   }
 
@@ -69,6 +89,7 @@ class _EditProductPageState extends State<EditProductPage> {
           child: ListView(
             children: <Widget>[
               TextFormField(
+                  initialValue: _editedProduct.title,
                   decoration: InputDecoration(labelText: 'Title'),
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) {
@@ -82,6 +103,7 @@ class _EditProductPageState extends State<EditProductPage> {
                     _editedProduct = _editedProduct.clone(title: title);
                   }),
               TextFormField(
+                initialValue: _editedProduct.price.toString(),
                 decoration: InputDecoration(labelText: 'Price'),
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
@@ -103,6 +125,7 @@ class _EditProductPageState extends State<EditProductPage> {
                 },
               ),
               TextFormField(
+                initialValue: _editedProduct.description,
                 decoration: InputDecoration(labelText: 'Description'),
                 maxLines: 3,
                 keyboardType: TextInputType.multiline,
