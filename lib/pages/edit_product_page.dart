@@ -75,7 +75,7 @@ class _EditProductPageState extends State<EditProductPage> {
                     FocusScope.of(context).requestFocus(_priceFocusNode);
                   },
                   validator: (value) {
-                    if (value.isEmpty) return 'Please insert a value';
+                    if (value.isEmpty) return 'Please enter a value.';
                     return null;
                   },
                   onSaved: (title) {
@@ -90,12 +90,11 @@ class _EditProductPageState extends State<EditProductPage> {
                   FocusScope.of(context).requestFocus(_descriptionFocusNode);
                 },
                 validator: (value) {
-                  if (value.isEmpty) return 'Please insert a value';
-                  try {
-                    double.parse(value);
-                  } catch (_) {
-                    return 'Please insert a valid price';
-                  }
+                  if (value.isEmpty) return 'Please enter a value.';
+                  if (double.tryParse(value) == null)
+                    return 'Please enter a valid number.';
+                  if (double.parse(value) < 0)
+                    return 'Please enter a number greater than zero.';
                   return null;
                 },
                 onSaved: (price) {
@@ -109,7 +108,9 @@ class _EditProductPageState extends State<EditProductPage> {
                 keyboardType: TextInputType.multiline,
                 focusNode: _descriptionFocusNode,
                 validator: (value) {
-                  if (value.isEmpty) return 'Please insert a value';
+                  if (value.isEmpty) return 'Please enter a description.';
+                  if (value.length < 10)
+                    return 'The description should be at least 10 characters long.';
                   return null;
                 },
                 onSaved: (description) {
@@ -152,7 +153,13 @@ class _EditProductPageState extends State<EditProductPage> {
                       focusNode: _imageUrlFocusNode,
                       onFieldSubmitted: (_) => _saveForm(),
                       validator: (value) {
-                        if (value.isEmpty) return 'Please insert a value';
+                        if (value.isEmpty) return 'Please enter an image URL.';
+                        var urlPattern =
+                            r"(https?|ftp)://([-A-Z0-9.]+)(/[-A-Z0-9+&@#/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#/%=~_|!:‌​,.;]*)?";
+                        bool isValidUrl =
+                            new RegExp(urlPattern, caseSensitive: false)
+                                .hasMatch(value);
+                        if (!isValidUrl) return 'Please enter a valid URL.';
                         return null;
                       },
                       onSaved: (imageUrl) {
