@@ -24,6 +24,7 @@ func main() {
 	productHandler := product.NewHandler(app)
 	router := httprouter.New()
 	router.GET("/product", productHandler.Get)
+	router.GET("/product/:id", productHandler.GetByID)
 	router.POST("/product", productHandler.Post)
 
 	log.Fatal(http.ListenAndServe(":8080", router))

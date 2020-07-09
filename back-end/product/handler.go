@@ -4,45 +4,73 @@ import (
 	"encoding/json"
 	"flutter_shop_app/app"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 )
 
 // NewHandler returns a new Handler
 func NewHandler(app app.State) *Handler {
-	return &Handler{app: app}
+	store := dataStore{db: app.Database}
+	return &Handler{app: app, store: store}
 }
 
 // Handler contains the HTTP endpoint handlers
 type Handler struct {
-	app app.State
+	app   app.State
+	store dataStore
+}
+
+func (handler *Handler) parseProduct(reqBody io.ReadCloser) (*Product, error) {
+	body, err := ioutil.ReadAll(reqBody)
+	defer reqBody.Close()
+	if err != nil {
+		return nil, err
+	}
+	product := &Product{}
+	err = json.Unmarshal(body, product)
+	if err != nil {
+		return nil, err
+	}
+	return product, nil
 }
 
 // Get returns all saved products
 func (handler *Handler) Get(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	query := "select * from product"
-	rows, err := handler.app.Database.Query(query)
+	products, err := handler.store.getAll()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
-	defer rows.Close()
+	data, err := json.Marshal(products)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(res, err)
+		return
+	}
+	res.WriteHeader(http.StatusOK)
+	fmt.Fprintln(res, string(data))
+}
 
-	products := []Product{}
-
-	for rows.Next() {
-		product := Product{}
-		err := rows.Scan(&product.ID, &product.Title, &product.Description, &product.Price, &product.ImageURL, &product.IsFavorite)
+// GetByID returns a product based on its ID
+func (handler *Handler) GetByID(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
+	if err != nil {
 		if err != nil {
 			res.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(res, err)
 			return
 		}
-		products = append(products, product)
-
+	}
+	products, err := handler.store.getByID(id)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(res, err)
+		return
 	}
 	data, err := json.Marshal(products)
 	if err != nil {
@@ -56,34 +84,18 @@ func (handler *Handler) Get(res http.ResponseWriter, req *http.Request, _ httpro
 
 // Post saves a new product
 func (handler *Handler) Post(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqBody, err := ioutil.ReadAll(req.Body)
-	defer req.Body.Close()
+	newProduct, err := handler.parseProduct(req.Body)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
-	newProduct := &Product{}
-	err = json.Unmarshal(reqBody, newProduct)
-	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
-		return
-	}
-	query := `INSERT INTO product (title, description, price, imageUrl, isFavorite)
-	VALUES(?, ?, ?, ?, ?)`
-	result, err := handler.app.Database.Exec(query, newProduct.Title, newProduct.Description, newProduct.Price, newProduct.ImageURL, newProduct.IsFavorite)
+	id, err := handler.store.add(*newProduct)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
 	res.WriteHeader(http.StatusOK)
-	newID, err := result.LastInsertId()
-	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
-		return
-	}
-	fmt.Fprintln(res, newID)
+	fmt.Fprintln(res, id)
 }
