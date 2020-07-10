@@ -56,12 +56,11 @@ class Products with ChangeNotifier {
     return _items.firstWhere((product) => product.id == id);
   }
 
-  Future<void> addProduct(Product product) {
-    return productService.add(product).then((String id) {
-      final newProduct = product.clone(id: id);
-      _items.insert(0, newProduct);
-      notifyListeners();
-    });
+  Future<void> addProduct(Product product) async {
+    final String id = await productService.add(product);
+    final newProduct = product.clone(id: id);
+    _items.insert(0, newProduct);
+    notifyListeners();
   }
 
   void updateProduct(String id, Product newProduct) {
