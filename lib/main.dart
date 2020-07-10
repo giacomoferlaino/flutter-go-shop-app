@@ -10,8 +10,14 @@ import './pages/products_overview_page.dart';
 import './pages/product_detailt_page.dart';
 import './pages/user_products_page.dart';
 import './pages/edit_product_page.dart';
+import './services/product_service.dart';
 
-void main() => runApp(MyApp());
+const String baseUrl = 'http://10.0.2.2:8080';
+final ProductService productService = ProductService(baseUrl);
+
+void main() {
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -19,7 +25,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => Products(),
+          create: (context) => Products(productService),
         ),
         ChangeNotifierProvider(
           create: (context) => Cart(),
