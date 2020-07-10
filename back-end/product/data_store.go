@@ -63,3 +63,16 @@ func (store *dataStore) add(product Product) (int64, error) {
 	}
 	return id, nil
 }
+
+func (store *dataStore) deleteByID(id int64) (int64, error) {
+	query := `DELETE FROM product WHERE id=?`
+	result, err := store.db.Exec(query, id)
+	if err != nil {
+		return 0, err
+	}
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return affectedRows, nil
+}

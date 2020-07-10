@@ -46,14 +46,41 @@ func (handler *Handler) Get(res http.ResponseWriter, req *http.Request, _ httpro
 		fmt.Fprint(res, err)
 		return
 	}
-	data, err := json.Marshal(products)
+	response, err := json.Marshal(products)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
 	res.WriteHeader(http.StatusOK)
-	fmt.Fprintln(res, string(data))
+	fmt.Fprintln(res, string(response))
+}
+
+// Post saves a new product
+func (handler *Handler) Post(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	newProduct, err := handler.parseProduct(req.Body)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(res, err)
+		return
+	}
+	id, err := handler.store.add(*newProduct)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(res, err)
+		return
+	}
+	data := struct {
+		ID string `json:"id"`
+	}{ID: strconv.FormatInt(id, 10)}
+	response, err := json.Marshal(data)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(res, err)
+		return
+	}
+	res.WriteHeader(http.StatusOK)
+	fmt.Fprintln(res, string(response))
 }
 
 // GetByID returns a product based on its ID
@@ -72,30 +99,41 @@ func (handler *Handler) GetByID(res http.ResponseWriter, req *http.Request, para
 		fmt.Fprint(res, err)
 		return
 	}
-	data, err := json.Marshal(products)
+	response, err := json.Marshal(products)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
 	res.WriteHeader(http.StatusOK)
-	fmt.Fprintln(res, string(data))
+	fmt.Fprintln(res, string(response))
 }
 
-// Post saves a new product
-func (handler *Handler) Post(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	newProduct, err := handler.parseProduct(req.Body)
+// DeleteByID returns the number of deleted rows
+func (handler *Handler) DeleteByID(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
+	if err != nil {
+		if err != nil {
+			res.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(res, err)
+			return
+		}
+	}
+	deletedRows, err := handler.store.deleteByID(id)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
-	id, err := handler.store.add(*newProduct)
+	data := []struct {
+		DeletedRows int64 `json:"deletedRows"`
+	}{{DeletedRows: deletedRows}}
+	response, err := json.Marshal(data)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
 	res.WriteHeader(http.StatusOK)
-	fmt.Fprintln(res, id)
+	fmt.Fprintln(res, string(response))
 }

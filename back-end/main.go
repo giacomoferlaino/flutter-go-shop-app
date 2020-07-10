@@ -24,8 +24,9 @@ func main() {
 	productHandler := product.NewHandler(app)
 	router := httprouter.New()
 	router.GET("/product", productHandler.Get)
-	router.GET("/product/:id", productHandler.GetByID)
 	router.POST("/product", productHandler.Post)
+	router.GET("/product/:id", productHandler.GetByID)
+	router.DELETE("/product/:id", productHandler.DeleteByID)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
