@@ -61,7 +61,23 @@ class _EditProductPageState extends State<EditProductPage> {
       _isLoading = false;
       Navigator.of(context).pop();
     } else {
-      products.addProduct(_editedProduct).then((_) {
+      products.addProduct(_editedProduct).catchError((error) {
+        return showDialog<Null>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('An error occured!'),
+            content: Text('Something went wrong.'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          ),
+        );
+      }).then((_) {
         _isLoading = false;
         Navigator.of(context).pop();
       });
