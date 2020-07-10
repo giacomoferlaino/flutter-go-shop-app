@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
-import 'product.dart';
+import './product.dart';
+import '../services/product_service.dart';
 
 class Products with ChangeNotifier {
+  final ProductService productService;
   List<Product> _items = [
     Product(
       id: 'p1',
@@ -38,6 +42,8 @@ class Products with ChangeNotifier {
     ),
   ];
 
+  Products(this.productService);
+
   List<Product> get items {
     return [..._items];
   }
@@ -51,9 +57,11 @@ class Products with ChangeNotifier {
   }
 
   void addProduct(Product product) {
-    final newProduct = product.clone(id: DateTime.now().toString());
-    _items.insert(0, newProduct);
-    notifyListeners();
+    productService.add(product).then((String id) {
+      final newProduct = product.clone(id: id);
+      _items.insert(0, newProduct);
+      notifyListeners();
+    });
   }
 
   void updateProduct(String id, Product newProduct) {
