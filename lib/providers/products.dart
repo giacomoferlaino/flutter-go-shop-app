@@ -56,8 +56,8 @@ class Products with ChangeNotifier {
     return _items.firstWhere((product) => product.id == id);
   }
 
-  void addProduct(Product product) {
-    productService.add(product).then((String id) {
+  Future<void> addProduct(Product product) {
+    return productService.add(product).then((String id) {
       final newProduct = product.clone(id: id);
       _items.insert(0, newProduct);
       notifyListeners();
