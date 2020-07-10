@@ -22,16 +22,18 @@ class ProductService {
 
   Future<List<Product>> getAll() async {
     Response response = await get(_fullPath);
-    List<Map<String, Object>> products = json.decode(response.body);
-    return products.map(
-      (item) => Product(
-        id: item['id'],
-        description: item['description'],
-        imageUrl: item['imageUrl'],
-        price: item['price'],
-        title: item['title'],
-        isFavorite: item['isFavorite'],
-      ),
-    );
+    List<dynamic> parsedBody = json.decode(response.body);
+    List<Product> products = [];
+    parsedBody.forEach((item) => products.add(
+          Product(
+            id: item['id'],
+            description: item['description'],
+            imageUrl: item['imageUrl'],
+            price: item['price'],
+            title: item['title'],
+            isFavorite: item['isFavorite'],
+          ),
+        ));
+    return products;
   }
 }

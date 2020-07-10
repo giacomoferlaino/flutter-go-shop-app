@@ -10,7 +10,7 @@ Content-Type: application/json
   "description": "new amazing product",
   "price": 9.99,
   "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTSLl_X5xNhD3U5GmU1ZTcy0HhMA5Kv3dnZ9XPSXTI28Q8XWWiVbfhBvM6Ri2PDpMYzpPLzVxE&usqp=CAc",
-  "isFavorite": true
+  "isFavorite": false
 }
 
 ###
