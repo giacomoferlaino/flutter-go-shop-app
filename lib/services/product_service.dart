@@ -36,4 +36,10 @@ class ProductService {
         ));
     return products;
   }
+
+  Future<int> deleteByID(String id) async {
+    Response response = await delete(_fullPath + '/$id');
+    List<dynamic> parsedBody = json.decode(response.body);
+    return parsedBody[0]['deletedRows'];
+  }
 }

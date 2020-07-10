@@ -37,7 +37,7 @@ class _EditProductPageState extends State<EditProductPage> {
           ModalRoute.of(context).settings.arguments as String;
       if (productId == null) return;
       _editedProduct =
-          Provider.of<Products>(context, listen: false).findById(productId);
+          Provider.of<Products>(context, listen: false).findByID(productId);
       _imageUrlController.text = _editedProduct.imageUrl;
     }
   }
@@ -57,14 +57,14 @@ class _EditProductPageState extends State<EditProductPage> {
     });
     final Products products = Provider.of<Products>(context, listen: false);
     if (_editedProduct.id != null) {
-      products.updateProduct(_editedProduct.id, _editedProduct);
+      products.updateByID(_editedProduct.id, _editedProduct);
       setState(() {
         _isLoading = false;
       });
       Navigator.of(context).pop();
     } else {
       try {
-        await products.addProduct(_editedProduct);
+        await products.add(_editedProduct);
         Navigator.of(context).pop();
       } catch (error) {
         await showDialog<Null>(

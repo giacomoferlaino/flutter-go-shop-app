@@ -17,7 +17,7 @@ class Products with ChangeNotifier {
     return _items.where((item) => item.isFavorite).toList();
   }
 
-  Product findById(String id) {
+  Product findByID(String id) {
     return _items.firstWhere((product) => product.id == id);
   }
 
@@ -27,22 +27,28 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addProduct(Product product) async {
+  Future<void> add(Product product) async {
     final String id = await productService.add(product);
     final newProduct = product.clone(id: id);
     _items.insert(0, newProduct);
     notifyListeners();
   }
 
-  void updateProduct(String id, Product newProduct) {
+  void updateByID(String id, Product newProduct) {
     final int prodIndex = _items.indexWhere((product) => product.id == id);
     if (prodIndex < 0) return;
     _items[prodIndex] = newProduct;
     notifyListeners();
   }
 
-  void deleteProduct(String id) {
-    _items.removeWhere((product) => product.id == id);
+  Future<void> deleteByID(String id) async {
+    int deletedRows = await productService.deleteByID(id);
+    if (deletedRows == 1) {
+      _items.removeWhere((product) => product.id == id);
+    }
+    if (deletedRows > 1) {
+      await fetchAll();
+    }
     notifyListeners();
   }
 }
