@@ -39,4 +39,15 @@ class Product with ChangeNotifier {
     isFavorite = !isFavorite;
     notifyListeners();
   }
+
+  Map<String, Object> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'price': price,
+      'imageUrl': imageUrl,
+      'isFavorite': isFavorite,
+    };
+  }
 }
