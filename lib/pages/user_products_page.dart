@@ -27,11 +27,14 @@ class UserProductsPage extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: Padding(
-        padding: EdgeInsets.all(8),
-        child: ListView.builder(
-          itemCount: products.items.length,
-          itemBuilder: (_, index) => UserProductItem(products.items[index]),
+      body: RefreshIndicator(
+        onRefresh: () => products.fetchAll(),
+        child: Padding(
+          padding: EdgeInsets.all(8),
+          child: ListView.builder(
+            itemCount: products.items.length,
+            itemBuilder: (_, index) => UserProductItem(products.items[index]),
+          ),
         ),
       ),
     );

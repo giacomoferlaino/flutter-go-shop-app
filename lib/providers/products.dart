@@ -23,7 +23,7 @@ class Products with ChangeNotifier {
 
   Future<void> fetchAll() async {
     List<Product> products = await productService.getAll();
-    _items.addAll(products);
+    _items = [...products];
     notifyListeners();
   }
 
