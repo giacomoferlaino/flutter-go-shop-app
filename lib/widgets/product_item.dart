@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/cart.dart';
 import '../providers/product.dart';
-import '../providers/products.dart';
 import '../pages/product_detailt_page.dart';
+import '../services/snack_bar_service.dart';
 
 class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final Products products = Provider.of<Products>(context, listen: false);
+    final SnackBarService snackBarService =
+        GetIt.instance.get<SnackBarService>();
     final Product product = Provider.of<Product>(context, listen: false);
     return Container(
       decoration: BoxDecoration(
@@ -36,19 +38,16 @@ class ProductItem extends StatelessWidget {
                 icon: Icon(Icons.shopping_cart),
                 onPressed: () {
                   cart.addItem(product);
-                  Scaffold.of(context).hideCurrentSnackBar();
-                  Scaffold.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                      'Added item to cart!',
-                    ),
-                    duration: Duration(seconds: 2),
+                  snackBarService.show(
+                    context: context,
+                    message: 'Item added to cart!',
                     action: SnackBarAction(
                       label: 'UNDO',
                       onPressed: () {
                         cart.removeSingleItem(product.id);
                       },
                     ),
-                  ));
+                  );
                 },
                 color: Theme.of(context).accentColor,
               ),

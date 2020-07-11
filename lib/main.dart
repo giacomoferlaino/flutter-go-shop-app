@@ -12,12 +12,18 @@ import './pages/product_detailt_page.dart';
 import './pages/user_products_page.dart';
 import './pages/edit_product_page.dart';
 import './services/product_service.dart';
+import 'services/snack_bar_service.dart';
 
 const String baseUrl = 'http://10.0.2.2:8080';
 
 void serviceLocatorSetup() {
   GetIt serviceLocator = GetIt.instance;
   serviceLocator.registerSingleton<ProductService>(ProductService(baseUrl));
+  serviceLocator.registerSingleton<SnackBarService>(
+    SnackBarService(
+      duration: Duration(seconds: 2),
+    ),
+  );
 }
 
 void main() {
