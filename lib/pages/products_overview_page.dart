@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/providers/shop_filters.dart';
 
 import '../providers/cart.dart';
-import '../providers/products.dart';
 import '../widgets/products_grid.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/badge.dart';
@@ -13,50 +13,22 @@ enum FilterOptions {
   All,
 }
 
-class ProductsOverviewPage extends StatefulWidget {
+class ProductsOverviewPage extends StatelessWidget {
   static const routeName = '/product-overview';
 
   @override
-  _ProductsOverviewPageState createState() => _ProductsOverviewPageState();
-}
-
-class _ProductsOverviewPageState extends State<ProductsOverviewPage> {
-  bool _showOnlyFavorites = false;
-  bool _isLoading = false;
-  Products products;
-  NavigatorState navigator;
-
-  @override
-  void initState() {
-    super.initState();
-    products = Provider.of<Products>(context, listen: false);
-    navigator = Navigator.of(context);
-    _isLoading = true;
-    products.fetchAll().then((_) => setState(() {
-          _isLoading = false;
-        }));
-  }
-
-  void _toggleFavorites() {
-    setState(() {
-      _showOnlyFavorites = !_showOnlyFavorites;
-    });
-  }
-
-  void _goToShoppingCart() {
-    navigator.pushNamed(CartPage.routeName);
-  }
-
-  @override
   Widget build(BuildContext context) {
+    NavigatorState navigator = Navigator.of(context);
+    ShopFilters shopFilters = Provider.of<ShopFilters>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('MyShop'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(
-                _showOnlyFavorites ? Icons.favorite : Icons.favorite_border),
-            onPressed: _toggleFavorites,
+            icon: Icon(shopFilters.showFavorites
+                ? Icons.favorite
+                : Icons.favorite_border),
+            onPressed: shopFilters.toggleFavorites,
             tooltip: 'Show only favorites',
           ),
           Padding(
@@ -75,20 +47,13 @@ class _ProductsOverviewPageState extends State<ProductsOverviewPage> {
               icon: Icon(
                 Icons.shopping_cart,
               ),
-              onPressed: _goToShoppingCart,
+              onPressed: () => navigator.pushNamed(CartPage.routeName),
             ),
           ),
         ],
       ),
       drawer: AppDrawer(),
-      body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : RefreshIndicator(
-              onRefresh: () => products.fetchAll(),
-              child: ProductsGrid(_showOnlyFavorites),
-            ),
+      body: ProductsGrid(),
     );
   }
 }

@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart';
 
 import '../providers/product.dart';
+import '../models/request_exception.dart';
 
 class ProductService {
   static const String relativePath = '/product';
@@ -21,20 +23,24 @@ class ProductService {
   }
 
   Future<List<Product>> getAll() async {
-    Response response = await get(_fullPath);
-    List<dynamic> parsedResponseBody = json.decode(response.body);
-    List<Product> products = [];
-    parsedResponseBody.forEach((item) => products.add(
-          Product(
-            id: item['id'],
-            description: item['description'],
-            imageUrl: item['imageUrl'],
-            price: item['price'],
-            title: item['title'],
-            isFavorite: item['isFavorite'],
-          ),
-        ));
-    return products;
+    try {
+      Response response = await get(_fullPath);
+      List<dynamic> parsedResponseBody = json.decode(response.body);
+      List<Product> products = [];
+      parsedResponseBody.forEach((item) => products.add(
+            Product(
+              id: item['id'],
+              description: item['description'],
+              imageUrl: item['imageUrl'],
+              price: item['price'],
+              title: item['title'],
+              isFavorite: item['isFavorite'],
+            ),
+          ));
+      return products;
+    } catch (error) {
+      throw getException(error);
+    }
   }
 
   Future<int> deleteByID(String id) async {
@@ -48,5 +54,12 @@ class ProductService {
         await put(_fullPath + '/$id', body: json.encode(product.toMap()));
     List<dynamic> parsedResponseBody = json.decode(response.body);
     return parsedResponseBody[0]['updatedRows'];
+  }
+
+  Exception getException(Exception exception) {
+    if (exception is SocketException) {
+      return RequestException('Internet connection error!');
+    }
+    return RequestException('An error occured');
   }
 }
