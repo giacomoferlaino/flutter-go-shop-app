@@ -3,11 +3,13 @@ import 'package:provider/provider.dart';
 
 import '../providers/cart.dart';
 import '../providers/product.dart';
+import '../providers/products.dart';
 import '../pages/product_detailt_page.dart';
 
 class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final Products products = Provider.of<Products>(context, listen: false);
     final Product product = Provider.of<Product>(context, listen: false);
     return Container(
       decoration: BoxDecoration(
@@ -23,7 +25,10 @@ class ProductItem extends StatelessWidget {
                 icon: Icon(product.isFavorite
                     ? Icons.favorite
                     : Icons.favorite_border),
-                onPressed: product.toggleFavorite,
+                onPressed: () async {
+                  product.toggleFavorite();
+                  await products.updateByID(product.id, product);
+                },
                 color: Theme.of(context).accentColor,
               ),
             ),
