@@ -9,7 +9,7 @@ type dataStore struct {
 }
 
 func (store *dataStore) getAll() ([]Product, error) {
-	query := "select * from product"
+	query := `select * from product`
 	rows, err := store.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func (store *dataStore) getAll() ([]Product, error) {
 }
 
 func (store *dataStore) getByID(id int64) ([]Product, error) {
-	query := "select * from product where id = ?"
+	query := `select * from product where id = ?`
 	rows, err := store.db.Query(query, id)
 	if err != nil {
 		return nil, err
@@ -67,6 +67,33 @@ func (store *dataStore) add(product Product) (int64, error) {
 func (store *dataStore) deleteByID(id int64) (int64, error) {
 	query := `DELETE FROM product WHERE id=?`
 	result, err := store.db.Exec(query, id)
+	if err != nil {
+		return 0, err
+	}
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return affectedRows, nil
+}
+
+func (store *dataStore) updateByID(id int64, product Product) (int64, error) {
+	query := `UPDATE product SET
+	title=?,
+	description=?,
+	price=?,
+	imageUrl=?,
+	isFavorite=? 
+	WHERE id=?`
+	result, err := store.db.Exec(
+		query,
+		product.Title,
+		product.Description,
+		product.Price,
+		product.ImageURL,
+		product.IsFavorite,
+		id,
+	)
 	if err != nil {
 		return 0, err
 	}

@@ -26,6 +26,7 @@ func main() {
 	router.GET("/product", productHandler.Get)
 	router.POST("/product", productHandler.Post)
 	router.GET("/product/:id", productHandler.GetByID)
+	router.PUT("/product/:id", productHandler.UpdateByID)
 	router.DELETE("/product/:id", productHandler.DeleteByID)
 
 	log.Fatal(http.ListenAndServe(":8080", router))

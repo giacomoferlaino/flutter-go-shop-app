@@ -137,3 +137,38 @@ func (handler *Handler) DeleteByID(res http.ResponseWriter, req *http.Request, p
 	res.WriteHeader(http.StatusOK)
 	fmt.Fprintln(res, string(response))
 }
+
+// UpdateByID returns the number of deleted rows
+func (handler *Handler) UpdateByID(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
+	if err != nil {
+		if err != nil {
+			res.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(res, err)
+			return
+		}
+	}
+	product, err := handler.parseProduct(req.Body)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(res, err)
+		return
+	}
+	updatedRows, err := handler.store.updateByID(id, *product)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(res, err)
+		return
+	}
+	data := []struct {
+		UpdatedRows int64 `json:"updatedRows"`
+	}{{UpdatedRows: updatedRows}}
+	response, err := json.Marshal(data)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(res, err)
+		return
+	}
+	res.WriteHeader(http.StatusOK)
+	fmt.Fprintln(res, string(response))
+}
