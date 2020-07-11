@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 import './product.dart';
 import '../services/product_service.dart';
 
 class Products with ChangeNotifier {
-  final ProductService productService;
+  final ProductService productService = GetIt.instance.get<ProductService>();
   List<Product> _items = [];
 
-  Products(this.productService);
+  Products();
 
   List<Product> get items {
     return [..._items];

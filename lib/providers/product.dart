@@ -1,6 +1,10 @@
 import 'package:flutter/foundation.dart';
+import 'package:get_it/get_it.dart';
+
+import '../services/product_service.dart';
 
 class Product with ChangeNotifier {
+  final ProductService productService = GetIt.instance.get<ProductService>();
   final String id;
   final String title;
   final String description;
@@ -35,8 +39,9 @@ class Product with ChangeNotifier {
     );
   }
 
-  void toggleFavorite() {
+  void toggleFavorite() async {
     isFavorite = !isFavorite;
+    await productService.updateByID(this.id, this);
     notifyListeners();
   }
 

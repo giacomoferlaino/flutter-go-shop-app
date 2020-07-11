@@ -24,15 +24,27 @@ class _ProductsOverviewPageState extends State<ProductsOverviewPage> {
   bool _showOnlyFavorites = false;
   bool _isLoading = false;
   Products products;
+  NavigatorState navigator;
 
   @override
   void initState() {
     super.initState();
-    _isLoading = true;
     products = Provider.of<Products>(context, listen: false);
+    navigator = Navigator.of(context);
+    _isLoading = true;
     products.fetchAll().then((_) => setState(() {
           _isLoading = false;
         }));
+  }
+
+  void _toggleFavorites() {
+    setState(() {
+      _showOnlyFavorites = !_showOnlyFavorites;
+    });
+  }
+
+  void _goToShoppingCart() {
+    navigator.pushNamed(CartPage.routeName);
   }
 
   @override
@@ -41,28 +53,18 @@ class _ProductsOverviewPageState extends State<ProductsOverviewPage> {
       appBar: AppBar(
         title: const Text('MyShop'),
         actions: <Widget>[
-          PopupMenuButton(
-            onSelected: (FilterOptions filter) {
-              setState(() {
-                if (filter == FilterOptions.Favorites)
-                  _showOnlyFavorites = true;
-                else
-                  _showOnlyFavorites = false;
-              });
-            },
+          IconButton(
             icon: Icon(
-              Icons.more_vert,
+                _showOnlyFavorites ? Icons.favorite : Icons.favorite_border),
+            onPressed: _toggleFavorites,
+            tooltip: 'Show only favorites',
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: VerticalDivider(
+              color: Colors.white54,
+              thickness: 1,
             ),
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                child: Text('Only favorites'),
-                value: FilterOptions.Favorites,
-              ),
-              PopupMenuItem(
-                child: Text('Show all'),
-                value: FilterOptions.All,
-              ),
-            ],
           ),
           Consumer<Cart>(
             builder: (_, cart, child) => Badge(
@@ -73,9 +75,7 @@ class _ProductsOverviewPageState extends State<ProductsOverviewPage> {
               icon: Icon(
                 Icons.shopping_cart,
               ),
-              onPressed: () {
-                Navigator.of(context).pushNamed(CartPage.routeName);
-              },
+              onPressed: _goToShoppingCart,
             ),
           ),
         ],

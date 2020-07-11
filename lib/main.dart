@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:get_it/get_it.dart';
 
 import './providers/cart.dart';
 import './providers/products.dart';
@@ -13,9 +14,14 @@ import './pages/edit_product_page.dart';
 import './services/product_service.dart';
 
 const String baseUrl = 'http://10.0.2.2:8080';
-final ProductService productService = ProductService(baseUrl);
+
+void serviceLocatorSetup() {
+  GetIt serviceLocator = GetIt.instance;
+  serviceLocator.registerSingleton<ProductService>(ProductService(baseUrl));
+}
 
 void main() {
+  serviceLocatorSetup();
   runApp(MyApp());
 }
 
@@ -25,14 +31,14 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => Products(productService),
+          create: (context) => Products(),
         ),
         ChangeNotifierProvider(
           create: (context) => Cart(),
         ),
         ChangeNotifierProvider(
           create: (context) => Orders(),
-        )
+        ),
       ],
       child: MaterialApp(
         title: 'MyShop',
