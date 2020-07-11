@@ -56,37 +56,34 @@ class _EditProductPageState extends State<EditProductPage> {
       _isLoading = true;
     });
     final Products products = Provider.of<Products>(context, listen: false);
-    if (_editedProduct.id != null) {
-      products.updateByID(_editedProduct.id, _editedProduct);
+    try {
+      if (_editedProduct.id != null) {
+        await products.updateByID(_editedProduct.id, _editedProduct);
+        Navigator.of(context).pop();
+      } else {
+        await products.add(_editedProduct);
+        Navigator.of(context).pop();
+      }
+    } catch (error) {
+      await showDialog<Null>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('An error occured!'),
+          content: Text('Something went wrong.'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        ),
+      );
+    } finally {
       setState(() {
         _isLoading = false;
       });
-      Navigator.of(context).pop();
-    } else {
-      try {
-        await products.add(_editedProduct);
-        Navigator.of(context).pop();
-      } catch (error) {
-        await showDialog<Null>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('An error occured!'),
-            content: Text('Something went wrong.'),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('Ok'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          ),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
     }
   }
 

@@ -22,9 +22,9 @@ class ProductService {
 
   Future<List<Product>> getAll() async {
     Response response = await get(_fullPath);
-    List<dynamic> parsedBody = json.decode(response.body);
+    List<dynamic> parsedResponseBody = json.decode(response.body);
     List<Product> products = [];
-    parsedBody.forEach((item) => products.add(
+    parsedResponseBody.forEach((item) => products.add(
           Product(
             id: item['id'],
             description: item['description'],
@@ -41,5 +41,12 @@ class ProductService {
     Response response = await delete(_fullPath + '/$id');
     List<dynamic> parsedBody = json.decode(response.body);
     return parsedBody[0]['deletedRows'];
+  }
+
+  Future<int> updateByID(String id, Product product) async {
+    Response response =
+        await put(_fullPath + '/$id', body: json.encode(product.toMap()));
+    List<dynamic> parsedResponseBody = json.decode(response.body);
+    return parsedResponseBody[0]['updatedRows'];
   }
 }

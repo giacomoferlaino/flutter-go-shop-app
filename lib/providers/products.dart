@@ -34,21 +34,27 @@ class Products with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateByID(String id, Product newProduct) {
-    final int prodIndex = _items.indexWhere((product) => product.id == id);
-    if (prodIndex < 0) return;
-    _items[prodIndex] = newProduct;
-    notifyListeners();
+  Future<void> updateByID(String id, Product product) async {
+    int updatedRows = await productService.updateByID(id, product);
+    if (updatedRows == 1) {
+      final int prodIndex = _items.indexWhere((product) => product.id == id);
+      if (prodIndex < 0) return;
+      _items[prodIndex] = product;
+      notifyListeners();
+    }
+    if (updatedRows > 1) {
+      await fetchAll();
+    }
   }
 
   Future<void> deleteByID(String id) async {
     int deletedRows = await productService.deleteByID(id);
     if (deletedRows == 1) {
       _items.removeWhere((product) => product.id == id);
+      notifyListeners();
     }
     if (deletedRows > 1) {
       await fetchAll();
     }
-    notifyListeners();
   }
 }
