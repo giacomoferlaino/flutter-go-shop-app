@@ -1,16 +1,16 @@
 package main
 
 import (
-	"database/sql"
 	"flutter_shop_app/app"
 	"flutter_shop_app/product"
 	"log"
 	"net/http"
 
+	"github.com/jinzhu/gorm"
 	"github.com/julienschmidt/httprouter"
 )
 
-var db *sql.DB
+var db *gorm.DB
 
 func init() {
 	db = initDB()

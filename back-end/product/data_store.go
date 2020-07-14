@@ -1,105 +1,46 @@
 package product
 
 import (
-	"database/sql"
+	"github.com/jinzhu/gorm"
 )
 
 type dataStore struct {
-	db *sql.DB
+	db *gorm.DB
 }
 
-func (store *dataStore) getAll() ([]Product, error) {
-	query := `select * from product`
-	rows, err := store.db.Query(query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	products := []Product{}
-
-	for rows.Next() {
-		product := Product{}
-		err := rows.Scan(&product.ID, &product.Title, &product.Description, &product.Price, &product.ImageURL, &product.IsFavorite)
-		if err != nil {
-			return nil, err
-		}
-		products = append(products, product)
-	}
-	return products, nil
+func (store *dataStore) getAll() []Product {
+	products := &[]Product{}
+	store.db.Find(products)
+	return *products
 }
 
-func (store *dataStore) getByID(id int64) ([]Product, error) {
-	query := `select * from product where id = ?`
-	rows, err := store.db.Query(query, id)
-	if err != nil {
-		return nil, err
+func (store *dataStore) getByID(id uint) []Product {
+	product := &Product{}
+	connection := store.db.First(product, id)
+	if connection.RecordNotFound() {
+		return []Product{}
 	}
-	defer rows.Close()
-
-	products := []Product{}
-
-	for rows.Next() {
-		product := Product{}
-		err := rows.Scan(&product.ID, &product.Title, &product.Description, &product.Price, &product.ImageURL, &product.IsFavorite)
-		if err != nil {
-			return nil, err
-		}
-		products = append(products, product)
-	}
-	return products, nil
+	return []Product{*product}
 }
 
-func (store *dataStore) add(product Product) (int64, error) {
-	query := `INSERT INTO product (title, description, price, imageUrl, isFavorite)
-	VALUES(?, ?, ?, ?, ?)`
-	result, err := store.db.Exec(query, product.Title, product.Description, product.Price, product.ImageURL, product.IsFavorite)
-	if err != nil {
-		return 0, err
-	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
+func (store *dataStore) add(product Product) *Product {
+	store.db.Create(&product)
+	return &product
 }
 
-func (store *dataStore) deleteByID(id int64) (int64, error) {
-	query := `DELETE FROM product WHERE id=?`
-	result, err := store.db.Exec(query, id)
-	if err != nil {
-		return 0, err
-	}
-	affectedRows, err := result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
-	return affectedRows, nil
+func (store *dataStore) deleteByID(id uint) int64 {
+	product := Product{}
+	product.ID = id
+	connection := store.db.Delete(&product)
+	return connection.RowsAffected
 }
 
-func (store *dataStore) updateByID(id int64, product Product) (int64, error) {
-	query := `UPDATE product SET
-	title=?,
-	description=?,
-	price=?,
-	imageUrl=?,
-	isFavorite=? 
-	WHERE id=?`
-	result, err := store.db.Exec(
-		query,
-		product.Title,
-		product.Description,
-		product.Price,
-		product.ImageURL,
-		product.IsFavorite,
-		id,
-	)
-	if err != nil {
-		return 0, err
+func (store *dataStore) updateByID(id uint, product Product) []Product {
+	targetProduct := Product{}
+	targetProduct.ID = id
+	connection := store.db.Model(&targetProduct).Updates(product)
+	if connection.RowsAffected == 0 {
+		return []Product{}
 	}
-	affectedRows, err := result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
-	return affectedRows, nil
+	return []Product{targetProduct}
 }

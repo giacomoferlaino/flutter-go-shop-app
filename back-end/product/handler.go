@@ -40,12 +40,7 @@ func (handler *Handler) parseProduct(reqBody io.ReadCloser) (*Product, error) {
 
 // Get returns all saved products
 func (handler *Handler) Get(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	products, err := handler.store.getAll()
-	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
-		return
-	}
+	products := handler.store.getAll()
 	response, err := json.Marshal(products)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
@@ -64,16 +59,8 @@ func (handler *Handler) Post(res http.ResponseWriter, req *http.Request, _ httpr
 		fmt.Fprint(res, err)
 		return
 	}
-	id, err := handler.store.add(*newProduct)
-	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
-		return
-	}
-	data := struct {
-		ID string `json:"id"`
-	}{ID: strconv.FormatInt(id, 10)}
-	response, err := json.Marshal(data)
+	createdProduct := handler.store.add(*newProduct)
+	response, err := json.Marshal(createdProduct)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
@@ -85,7 +72,7 @@ func (handler *Handler) Post(res http.ResponseWriter, req *http.Request, _ httpr
 
 // GetByID returns a product based on its ID
 func (handler *Handler) GetByID(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
+	id, err := strconv.ParseUint(params.ByName("id"), 10, 64)
 	if err != nil {
 		if err != nil {
 			res.WriteHeader(http.StatusInternalServerError)
@@ -93,12 +80,7 @@ func (handler *Handler) GetByID(res http.ResponseWriter, req *http.Request, para
 			return
 		}
 	}
-	products, err := handler.store.getByID(id)
-	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
-		return
-	}
+	products := handler.store.getByID(uint(id))
 	response, err := json.Marshal(products)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
@@ -119,12 +101,7 @@ func (handler *Handler) DeleteByID(res http.ResponseWriter, req *http.Request, p
 			return
 		}
 	}
-	deletedRows, err := handler.store.deleteByID(id)
-	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
-		return
-	}
+	deletedRows := handler.store.deleteByID(uint(id))
 	data := []struct {
 		DeletedRows int64 `json:"deletedRows"`
 	}{{DeletedRows: deletedRows}}
@@ -154,16 +131,8 @@ func (handler *Handler) UpdateByID(res http.ResponseWriter, req *http.Request, p
 		fmt.Fprint(res, err)
 		return
 	}
-	updatedRows, err := handler.store.updateByID(id, *product)
-	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
-		return
-	}
-	data := []struct {
-		UpdatedRows int64 `json:"updatedRows"`
-	}{{UpdatedRows: updatedRows}}
-	response, err := json.Marshal(data)
+	updatedProduct := handler.store.updateByID(uint(id), *product)
+	response, err := json.Marshal(updatedProduct)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)

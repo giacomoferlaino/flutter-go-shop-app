@@ -1,8 +1,12 @@
 package product
 
+import (
+	"flutter_shop_app/orm"
+)
+
 // Product data model
 type Product struct {
-	ID          string  `json:"id"`
+	orm.Model
 	Title       string  `json:"title"`
 	Description string  `json:"description"`
 	Price       float32 `json:"price"`

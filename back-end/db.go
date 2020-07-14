@@ -1,25 +1,20 @@
 package main
 
 import (
-	"database/sql"
+	"flutter_shop_app/product"
 	"log"
 
-	_ "github.com/mattn/go-sqlite3" // loads sqlite DB driver
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-func initDB() *sql.DB {
-	db, err := sql.Open("sqlite3", "./foo.db")
+func initDB() *gorm.DB {
+	db, err := gorm.Open("sqlite3", "./foo.db")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error while connecting to database.\n Error: %v", err)
 	}
-	initStatement := `
-	CREATE TABLE IF NOT EXISTS product (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, price REAL, imageUrl TEXT, isFavorite INTEGER);
-	`
 
-	_, err = db.Exec(initStatement)
-	if err != nil {
-		log.Fatal(err)
-	}
+	db.AutoMigrate(&product.Product{})
 
 	return db
 }

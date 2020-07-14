@@ -1,8 +1,10 @@
 package app
 
-import "database/sql"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 // State contains the current application state
 type State struct {
-	Database *sql.DB
+	Database *gorm.DB
 }
