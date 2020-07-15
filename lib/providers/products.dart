@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 
 import './product.dart';
 import '../services/product_service.dart';
+import '../models/api_response.dart';
 
 class Products with ChangeNotifier {
   final ProductService productService = GetIt.instance.get<ProductService>();
@@ -18,43 +19,44 @@ class Products with ChangeNotifier {
     return _items.where((item) => item.isFavorite).toList();
   }
 
-  Product findByID(String id) {
+  Product findByID(int id) {
     return _items.firstWhere((product) => product.id == id);
   }
 
   Future<void> fetchAll() async {
-    List<Product> products = await productService.getAll();
-    _items = [...products];
+    ApiResponse response = await productService.getAll();
+    _items = [...response.data];
     notifyListeners();
   }
 
   Future<void> add(Product product) async {
-    final String id = await productService.add(product);
-    final newProduct = product.clone(id: id);
+    ApiResponse response = await productService.add(product);
+    Product createdProduct = response.data[0];
+    final newProduct = product.clone(id: createdProduct.id);
     _items.insert(0, newProduct);
     notifyListeners();
   }
 
-  Future<void> updateByID(String id, Product product) async {
-    int updatedRows = await productService.updateByID(id, product);
-    if (updatedRows == 1) {
+  Future<void> updateByID(int id, Product product) async {
+    ApiResponse response = await productService.updateByID(id, product);
+    if (response.meta.rows == 1) {
       final int prodIndex = _items.indexWhere((product) => product.id == id);
       if (prodIndex < 0) return;
       _items[prodIndex] = product;
       notifyListeners();
     }
-    if (updatedRows > 1) {
+    if (response.meta.rows > 1) {
       await fetchAll();
     }
   }
 
-  Future<void> deleteByID(String id) async {
-    int deletedRows = await productService.deleteByID(id);
-    if (deletedRows == 1) {
+  Future<void> deleteByID(int id) async {
+    ApiResponse response = await productService.deleteByID(id);
+    if (response.meta.rows == 1) {
       _items.removeWhere((product) => product.id == id);
       notifyListeners();
     }
-    if (deletedRows > 1) {
+    if (response.meta.rows > 1) {
       await fetchAll();
     }
   }

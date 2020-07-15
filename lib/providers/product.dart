@@ -5,7 +5,7 @@ import '../services/product_service.dart';
 
 class Product with ChangeNotifier {
   final ProductService productService = GetIt.instance.get<ProductService>();
-  final String id;
+  final int id;
   final String title;
   final String description;
   final double price;
@@ -22,7 +22,7 @@ class Product with ChangeNotifier {
   });
 
   Product clone({
-    String id,
+    int id,
     String title,
     String description,
     double price,

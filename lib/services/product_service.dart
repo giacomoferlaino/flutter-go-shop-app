@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
+import 'package:shop_app/models/api_response.dart';
 
 import '../providers/product.dart';
 import '../models/request_exception.dart';
@@ -15,45 +16,41 @@ class ProductService {
     _fullPath = _baseUrl + relativePath;
   }
 
-  Future<String> add(Product product) async {
-    Response response =
-        await post(_fullPath, body: json.encode(product.toMap()));
-    final String id = json.decode(response.body)['id'];
-    return id;
+  Product _parseProduct(dynamic item) {
+    return Product(
+      id: item['id'],
+      description: item['description'],
+      imageUrl: item['imageUrl'],
+      price: item['price'],
+      title: item['title'],
+      isFavorite: item['isFavorite'],
+    );
   }
 
-  Future<List<Product>> getAll() async {
+  Future<ApiResponse<Product>> add(Product product) async {
+    Response response =
+        await post(_fullPath, body: json.encode(product.toMap()));
+    return ApiResponse<Product>.parse(response, _parseProduct);
+  }
+
+  Future<ApiResponse<Product>> getAll() async {
     try {
       Response response = await get(_fullPath);
-      List<dynamic> parsedResponseBody = json.decode(response.body);
-      List<Product> products = [];
-      parsedResponseBody.forEach((item) => products.add(
-            Product(
-              id: item['id'],
-              description: item['description'],
-              imageUrl: item['imageUrl'],
-              price: item['price'],
-              title: item['title'],
-              isFavorite: item['isFavorite'],
-            ),
-          ));
-      return products;
+      return ApiResponse<Product>.parse(response, _parseProduct);
     } catch (error) {
       throw getException(error);
     }
   }
 
-  Future<int> deleteByID(String id) async {
+  Future<ApiResponse<Product>> deleteByID(int id) async {
     Response response = await delete(_fullPath + '/$id');
-    List<dynamic> parsedBody = json.decode(response.body);
-    return parsedBody[0]['deletedRows'];
+    return ApiResponse<Product>.parse(response, _parseProduct);
   }
 
-  Future<int> updateByID(String id, Product product) async {
+  Future<ApiResponse<Product>> updateByID(int id, Product product) async {
     Response response =
         await put(_fullPath + '/$id', body: json.encode(product.toMap()));
-    List<dynamic> parsedResponseBody = json.decode(response.body);
-    return parsedResponseBody[0]['updatedRows'];
+    return ApiResponse<Product>.parse(response, _parseProduct);
   }
 
   Exception getException(Exception exception) {
