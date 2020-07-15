@@ -1,6 +1,8 @@
 package product
 
 import (
+	"flutter_shop_app/orm"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -8,54 +10,65 @@ type dataStore struct {
 	db *gorm.DB
 }
 
-func (store *dataStore) getAll() ([]Product, error) {
-	products := &[]Product{}
-	connection := store.db.Find(products)
+func (store *dataStore) getAll() (*orm.Response, error) {
+	products := Products{}
+	connection := store.db.Find(&products)
 	if connection.Error != nil {
 		return nil, connection.Error
 	}
-	return *products, nil
+	response := &orm.Response{
+		Meta: orm.MetaData{Rows: connection.RowsAffected},
+		Data: products.toGenericSlice(),
+	}
+	return response, nil
 }
 
-func (store *dataStore) getByID(id uint) ([]Product, error) {
-	product := &Product{}
-	connection := store.db.First(product, id)
+func (store *dataStore) getByID(id uint) (*orm.Response, error) {
+	product := Product{}
+	connection := store.db.First(&product, id)
+	response := &orm.Response{Meta: orm.MetaData{Rows: connection.RowsAffected}}
 	if connection.RecordNotFound() {
-		return []Product{}, nil
+		return response, nil
 	}
 	if connection.Error != nil {
 		return nil, connection.Error
 	}
-	return []Product{*product}, nil
+	response.Data = (&Products{product}).toGenericSlice()
+	return response, nil
 }
 
-func (store *dataStore) add(product Product) (*Product, error) {
+func (store *dataStore) add(product Product) (*orm.Response, error) {
 	connection := store.db.Create(&product)
 	if connection.Error != nil {
 		return nil, connection.Error
 	}
-	return &product, nil
+	response := &orm.Response{
+		Meta: orm.MetaData{Rows: connection.RowsAffected},
+		Data: (&Products{product}).toGenericSlice(),
+	}
+	return response, nil
 }
 
-func (store *dataStore) deleteByID(id uint) (int64, error) {
-	product := Product{}
-	product.ID = id
+func (store *dataStore) deleteByID(id uint) (*orm.Response, error) {
+	product := Product{Model: orm.Model{ID: id}}
 	connection := store.db.Delete(&product)
 	if connection.Error != nil {
-		return 0, connection.Error
+		return nil, connection.Error
 	}
-	return connection.RowsAffected, nil
+	response := &orm.Response{Meta: orm.MetaData{Rows: connection.RowsAffected}}
+	return response, nil
 }
 
-func (store *dataStore) updateByID(id uint, product Product) ([]Product, error) {
+func (store *dataStore) updateByID(id uint, product Product) (*orm.Response, error) {
 	targetProduct := Product{}
 	targetProduct.ID = id
 	connection := store.db.Model(&targetProduct).Updates(product)
 	if connection.Error != nil {
 		return nil, connection.Error
 	}
-	if connection.RowsAffected == 0 {
-		return []Product{}, nil
+	response := &orm.Response{
+		Meta: orm.MetaData{Rows: connection.RowsAffected},
+		Data: (&Products{targetProduct}).toGenericSlice(),
 	}
-	return []Product{targetProduct}, nil
+	return response, nil
 }

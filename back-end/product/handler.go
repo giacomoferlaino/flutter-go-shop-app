@@ -40,20 +40,20 @@ func (handler *Handler) parseProduct(reqBody io.ReadCloser) (*Product, error) {
 
 // Get returns all saved products
 func (handler *Handler) Get(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	products, err := handler.store.getAll()
+	queryResponse, err := handler.store.getAll()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
-	response, err := json.Marshal(products)
+	apiResponse, err := json.Marshal(queryResponse)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
 	res.WriteHeader(http.StatusOK)
-	fmt.Fprintln(res, string(response))
+	fmt.Fprintln(res, string(apiResponse))
 }
 
 // Post saves a new product
@@ -64,20 +64,20 @@ func (handler *Handler) Post(res http.ResponseWriter, req *http.Request, _ httpr
 		fmt.Fprint(res, err)
 		return
 	}
-	createdProduct, err := handler.store.add(*newProduct)
+	queryResponse, err := handler.store.add(*newProduct)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
-	response, err := json.Marshal(createdProduct)
+	apiResponse, err := json.Marshal(queryResponse)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
 	res.WriteHeader(http.StatusOK)
-	fmt.Fprintln(res, string(response))
+	fmt.Fprintln(res, string(apiResponse))
 }
 
 // GetByID returns a product based on its ID
@@ -88,20 +88,20 @@ func (handler *Handler) GetByID(res http.ResponseWriter, req *http.Request, para
 		fmt.Fprint(res, err)
 		return
 	}
-	products, err := handler.store.getByID(uint(id))
+	queryResponse, err := handler.store.getByID(uint(id))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
-	response, err := json.Marshal(products)
+	apiResponse, err := json.Marshal(queryResponse)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
 	res.WriteHeader(http.StatusOK)
-	fmt.Fprintln(res, string(response))
+	fmt.Fprintln(res, string(apiResponse))
 }
 
 // DeleteByID returns the number of deleted rows
@@ -112,23 +112,20 @@ func (handler *Handler) DeleteByID(res http.ResponseWriter, req *http.Request, p
 		fmt.Fprint(res, err)
 		return
 	}
-	deletedRows, err := handler.store.deleteByID(uint(id))
+	queryResponse, err := handler.store.deleteByID(uint(id))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
-	data := []struct {
-		DeletedRows int64 `json:"deletedRows"`
-	}{{DeletedRows: deletedRows}}
-	response, err := json.Marshal(data)
+	apiResponse, err := json.Marshal(queryResponse)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
 	res.WriteHeader(http.StatusOK)
-	fmt.Fprintln(res, string(response))
+	fmt.Fprintln(res, string(apiResponse))
 }
 
 // UpdateByID returns the number of deleted rows
@@ -139,25 +136,24 @@ func (handler *Handler) UpdateByID(res http.ResponseWriter, req *http.Request, p
 		fmt.Fprint(res, err)
 		return
 	}
-
 	product, err := handler.parseProduct(req.Body)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
-	updatedProduct, err := handler.store.updateByID(uint(id), *product)
+	queryResponse, err := handler.store.updateByID(uint(id), *product)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
-	response, err := json.Marshal(updatedProduct)
+	apiResponse, err := json.Marshal(queryResponse)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
 		return
 	}
 	res.WriteHeader(http.StatusOK)
-	fmt.Fprintln(res, string(response))
+	fmt.Fprintln(res, string(apiResponse))
 }

@@ -6,16 +6,13 @@ import (
 
 // MetaData contains a sql query metadata
 type MetaData struct {
-	Rows int `json:"rows"`
+	Rows int64 `json:"rows"`
 }
-
-// Data contains the data returned by a sql query
-type Data []interface{}
 
 // Response is the ORM response data model
 type Response struct {
-	Meta MetaData `json:"meta"`
-	Data Data     `json:"data"`
+	Meta MetaData      `json:"meta"`
+	Data []interface{} `json:"data"`
 }
 
 // MarshalJSON returns the response in text format
