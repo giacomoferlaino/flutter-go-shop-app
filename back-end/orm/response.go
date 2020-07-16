@@ -11,8 +11,8 @@ type MetaData struct {
 
 // Response is the ORM response data model
 type Response struct {
-	Meta MetaData      `json:"meta"`
-	Data []interface{} `json:"data"`
+	Meta MetaData    `json:"meta"`
+	Data interface{} `json:"data"`
 }
 
 // MarshalJSON returns the response in text format

@@ -11,14 +11,14 @@ type dataStore struct {
 }
 
 func (store *dataStore) getAll() (*orm.Response, error) {
-	products := Products{}
+	products := []Product{}
 	connection := store.db.Find(&products)
 	if connection.Error != nil {
 		return nil, connection.Error
 	}
 	response := &orm.Response{
 		Meta: orm.MetaData{Rows: connection.RowsAffected},
-		Data: products.toGenericSlice(),
+		Data: products,
 	}
 	return response, nil
 }
@@ -33,7 +33,7 @@ func (store *dataStore) getByID(id uint) (*orm.Response, error) {
 	if connection.Error != nil {
 		return nil, connection.Error
 	}
-	response.Data = (&Products{product}).toGenericSlice()
+	response.Data = []Product{product}
 	return response, nil
 }
 
@@ -44,7 +44,7 @@ func (store *dataStore) add(product Product) (*orm.Response, error) {
 	}
 	response := &orm.Response{
 		Meta: orm.MetaData{Rows: connection.RowsAffected},
-		Data: (&Products{product}).toGenericSlice(),
+		Data: []Product{product},
 	}
 	return response, nil
 }
@@ -68,7 +68,7 @@ func (store *dataStore) updateByID(id uint, product Product) (*orm.Response, err
 	}
 	response := &orm.Response{
 		Meta: orm.MetaData{Rows: connection.RowsAffected},
-		Data: (&Products{targetProduct}).toGenericSlice(),
+		Data: []Product{targetProduct},
 	}
 	return response, nil
 }
