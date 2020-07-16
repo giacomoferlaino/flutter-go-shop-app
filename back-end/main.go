@@ -2,7 +2,7 @@ package main
 
 import (
 	"flutter_shop_app/app"
-	"flutter_shop_app/product"
+	"flutter_shop_app/orm"
 	"log"
 	"net/http"
 
@@ -21,7 +21,7 @@ func main() {
 	app := app.State{
 		Database: db,
 	}
-	productHandler := product.NewHandler(app)
+	productHandler := NewHandler(app, &orm.ProductDataStore{DB: app.Database})
 	router := httprouter.New()
 	router.GET("/product", productHandler.Get)
 	router.POST("/product", productHandler.Post)

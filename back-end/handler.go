@@ -1,8 +1,9 @@
-package product
+package main
 
 import (
 	"encoding/json"
 	"flutter_shop_app/app"
+	"flutter_shop_app/orm"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -13,24 +14,23 @@ import (
 )
 
 // NewHandler returns a new Handler
-func NewHandler(app app.State) *Handler {
-	store := dataStore{db: app.Database}
-	return &Handler{app: app, store: store}
+func NewHandler(app app.State, dataStore orm.DataStore) *Handler {
+	return &Handler{app: app, store: dataStore}
 }
 
 // Handler contains the HTTP endpoint handlers
 type Handler struct {
 	app   app.State
-	store dataStore
+	store orm.DataStore
 }
 
-func (handler *Handler) parseProduct(reqBody io.ReadCloser) (*Product, error) {
+func (handler *Handler) parseProduct(reqBody io.ReadCloser) (*orm.Product, error) {
 	body, err := ioutil.ReadAll(reqBody)
 	defer reqBody.Close()
 	if err != nil {
 		return nil, err
 	}
-	product := &Product{}
+	product := &orm.Product{}
 	err = json.Unmarshal(body, product)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (handler *Handler) parseProduct(reqBody io.ReadCloser) (*Product, error) {
 
 // Get returns all saved products
 func (handler *Handler) Get(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	queryResponse, err := handler.store.getAll()
+	queryResponse, err := handler.store.GetAll()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
@@ -64,7 +64,7 @@ func (handler *Handler) Post(res http.ResponseWriter, req *http.Request, _ httpr
 		fmt.Fprint(res, err)
 		return
 	}
-	queryResponse, err := handler.store.add(*newProduct)
+	queryResponse, err := handler.store.Add(*newProduct)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
@@ -88,7 +88,7 @@ func (handler *Handler) GetByID(res http.ResponseWriter, req *http.Request, para
 		fmt.Fprint(res, err)
 		return
 	}
-	queryResponse, err := handler.store.getByID(uint(id))
+	queryResponse, err := handler.store.GetByID(uint(id))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
@@ -112,7 +112,7 @@ func (handler *Handler) DeleteByID(res http.ResponseWriter, req *http.Request, p
 		fmt.Fprint(res, err)
 		return
 	}
-	queryResponse, err := handler.store.deleteByID(uint(id))
+	queryResponse, err := handler.store.DeleteByID(uint(id))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)
@@ -142,7 +142,7 @@ func (handler *Handler) UpdateByID(res http.ResponseWriter, req *http.Request, p
 		fmt.Fprint(res, err)
 		return
 	}
-	queryResponse, err := handler.store.updateByID(uint(id), *product)
+	queryResponse, err := handler.store.UpdateByID(uint(id), *product)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, err)

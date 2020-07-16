@@ -1,8 +1,9 @@
 package main
 
 import (
-	"flutter_shop_app/product"
 	"log"
+
+	"flutter_shop_app/orm"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -14,7 +15,8 @@ func initDB() *gorm.DB {
 		log.Fatalf("Error while connecting to database.\n Error: %v", err)
 	}
 
-	db.AutoMigrate(&product.Product{})
+	db.AutoMigrate(&orm.Product{})
+	db.AutoMigrate(&orm.Order{})
 
 	return db
 }
