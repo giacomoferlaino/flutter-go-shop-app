@@ -17,6 +17,7 @@ func initDB() *gorm.DB {
 
 	db.AutoMigrate(&orm.Product{})
 	db.AutoMigrate(&orm.Order{})
+	db.AutoMigrate(&orm.CartItem{})
 
 	return db
 }

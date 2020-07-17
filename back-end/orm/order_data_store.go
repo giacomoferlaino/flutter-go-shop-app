@@ -31,7 +31,7 @@ func (store *OrderDataStore) ParseJSON(reqBody io.ReadCloser) (interface{}, erro
 // GetAll returns all the saved orders
 func (store *OrderDataStore) GetAll() (*Response, error) {
 	orders := []Order{}
-	connection := store.DB.Preload("Products").Find(&orders)
+	connection := store.DB.Preload("CartItems.Product").Find(&orders)
 	response := &Response{
 		Meta: MetaData{Rows: connection.RowsAffected},
 	}
@@ -48,7 +48,7 @@ func (store *OrderDataStore) GetAll() (*Response, error) {
 // GetByID returns a order based on its ID
 func (store *OrderDataStore) GetByID(id uint) (*Response, error) {
 	order := Order{}
-	connection := store.DB.Preload("Products").First(&order, id)
+	connection := store.DB.Preload("CartItems.Product").First(&order, id)
 	response := &Response{Meta: MetaData{Rows: connection.RowsAffected}}
 	if connection.RecordNotFound() {
 		return response, nil
@@ -81,7 +81,7 @@ func (store *OrderDataStore) DeleteByID(id uint) (*Response, error) {
 	if connection.Error != nil {
 		return nil, connection.Error
 	}
-	connection.Model(&order).Association("Products").Clear()
+	connection.Model(&order).Association("CartItems").Clear()
 	if connection.Error != nil {
 		return nil, connection.Error
 	}
@@ -94,7 +94,7 @@ func (store *OrderDataStore) UpdateByID(id uint, item interface{}) (*Response, e
 	order := item.(*Order)
 	order.ID = id
 	connection := store.DB.Save(order)
-	connection.Model(order).Association("Products").Replace(order.Products)
+	connection.Model(order).Association("CartItems").Replace(order.CartItems)
 	if connection.Error != nil {
 		return nil, connection.Error
 	}
