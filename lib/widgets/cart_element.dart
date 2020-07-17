@@ -6,14 +6,14 @@ import '../providers/cart.dart';
 
 class CartElement extends StatelessWidget {
   final CartItem cartItem;
-  final String productId;
+  final int productId;
 
   CartElement(this.cartItem, this.productId);
 
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: ValueKey(cartItem.id),
+      key: ValueKey(cartItem.product.id),
       direction: DismissDirection.endToStart,
       confirmDismiss: (direction) {
         return showDialog(
@@ -68,12 +68,13 @@ class CartElement extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(5),
                 child: FittedBox(
-                  child: Text('\$${cartItem.price}'),
+                  child: Text('\$${cartItem.product.price}'),
                 ),
               ),
             ),
-            title: Text(cartItem.title),
-            subtitle: Text('Total: \$${cartItem.quantity * cartItem.price}'),
+            title: Text(cartItem.product.title),
+            subtitle:
+                Text('Total: \$${cartItem.quantity * cartItem.product.price}'),
             trailing: Text('x ${cartItem.quantity}'),
           ),
         ),

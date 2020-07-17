@@ -45,7 +45,7 @@ class Product with ChangeNotifier {
     notifyListeners();
   }
 
-  Map<String, Object> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,

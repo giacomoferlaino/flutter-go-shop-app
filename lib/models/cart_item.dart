@@ -1,15 +1,20 @@
 import 'package:flutter/foundation.dart';
 
+import '../providers/product.dart';
+
 class CartItem {
-  final String id;
-  final String title;
+  final Product product;
   final int quantity;
-  final double price;
 
   CartItem({
-    @required this.id,
-    @required this.title,
-    @required this.price,
+    @required this.product,
     this.quantity = 1,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'product': product,
+      'quantity': quantity,
+    };
+  }
 }

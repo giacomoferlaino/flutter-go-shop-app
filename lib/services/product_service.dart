@@ -28,8 +28,7 @@ class ProductService {
   }
 
   Future<ApiResponse<Product>> add(Product product) async {
-    Response response =
-        await post(_fullPath, body: json.encode(product.toMap()));
+    Response response = await post(_fullPath, body: json.encode(product));
     return ApiResponse<Product>.parse(response, _parseProduct);
   }
 
@@ -49,11 +48,11 @@ class ProductService {
 
   Future<ApiResponse<Product>> updateByID(int id, Product product) async {
     Response response =
-        await put(_fullPath + '/$id', body: json.encode(product.toMap()));
+        await put(_fullPath + '/$id', body: json.encode(product));
     return ApiResponse<Product>.parse(response, _parseProduct);
   }
 
-  Exception getException(Exception exception) {
+  Exception getException(Error exception) {
     if (exception is SocketException) {
       return RequestException('Internet connection error!');
     }

@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../models/order_item.dart';
 
@@ -25,8 +24,7 @@ class _OrderElementState extends State<OrderElement> {
         children: <Widget>[
           ListTile(
             title: Text('\$${widget.order.amount}'),
-            subtitle: Text(
-                DateFormat('dd/MM/yyyy hh:mm').format(widget.order.dateTime)),
+            subtitle: Text(widget.order.formatDateTime()),
             trailing: IconButton(
               icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
               onPressed: () {
@@ -39,20 +37,21 @@ class _OrderElementState extends State<OrderElement> {
           if (_expanded)
             Container(
               padding: EdgeInsets.all(15),
-              height: min(widget.order.products.length * 20.0 + 10, 100),
+              height: min(widget.order.cartItems.length * 20.0 + 10, 100),
               child: ListView(
-                children: widget.order.products
-                    .map((product) => Row(
+                children: widget.order.cartItems
+                    .map((cartItem) => Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Text(
-                              product.title,
+                              cartItem.product.title,
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text('${product.quantity}x \$${product.price}',
+                            Text(
+                                '${cartItem.quantity}x \$${cartItem.product.price}',
                                 style: TextStyle(
                                   fontSize: 18,
                                   color: Colors.grey,
