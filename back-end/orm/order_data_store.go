@@ -81,6 +81,10 @@ func (store *OrderDataStore) DeleteByID(id uint) (*Response, error) {
 	if connection.Error != nil {
 		return nil, connection.Error
 	}
+	connection.Model(&order).Association("Products").Clear()
+	if connection.Error != nil {
+		return nil, connection.Error
+	}
 	response := &Response{Meta: MetaData{Rows: connection.RowsAffected}}
 	return response, nil
 }
