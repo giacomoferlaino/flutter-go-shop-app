@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
-import 'package:shop_app/models/api_response.dart';
 
 import '../models/order_item.dart';
 import '../models/request_exception.dart';
+import '../models/api_response.dart';
+import '../models/cart_item.dart';
+import '../providers/product.dart';
 
 class OrderService {
   static const String relativePath = '/order';
@@ -17,10 +19,25 @@ class OrderService {
   }
 
   OrderItem _parseOrder(dynamic item) {
+    final List<CartItem> cartItems = [];
+    item['cartItems'].forEach((item) {
+      Product product = Product(
+        id: item['product']['id'],
+        description: item['product']['description'],
+        imageUrl: item['product']['imageUrl'],
+        price: item['product']['price'],
+        isFavorite: item['product']['isFavorite'],
+        title: item['product']['title'],
+      );
+      return cartItems.add(CartItem(
+        product: product,
+        quantity: item['quantity'],
+      ));
+    });
     return OrderItem(
       id: item['id'],
       amount: item['amount'],
-      cartItems: item['products'],
+      cartItems: cartItems,
       dateTime: DateTime.parse(item['dateTime']),
     );
   }
