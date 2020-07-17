@@ -1,0 +1,46 @@
+GET http://localhost:8080/order HTTP/1.1
+
+###
+
+POST http://localhost:8080/order HTTP/1.1
+Content-Type: application/json
+
+{
+  "amount": "9.99",
+  "products": [{
+  "id": 5,
+  "title": "New product",
+  "description": "new amazing product",
+  "price": 9.99,
+  "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTSLl_X5xNhD3U5GmU1ZTcy0HhMA5Kv3dnZ9XPSXTI28Q8XWWiVbfhBvM6Ri2PDpMYzpPLzVxE&usqp=CAc",
+  "isFavorite": false
+}],
+  "dateTime": "dateTime sample"
+}
+
+###
+
+GET http://localhost:8080/order/11 HTTP/1.1
+
+###
+
+PUT http://localhost:8080/order/10 HTTP/1.1
+Content-Type: application/json
+
+{
+  "amount": "19.99",
+  "products": [{
+  "id": 7,
+  "title": "New product",
+  "description": "new amazing product",
+  "price": 9.99,
+  "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTSLl_X5xNhD3U5GmU1ZTcy0HhMA5Kv3dnZ9XPSXTI28Q8XWWiVbfhBvM6Ri2PDpMYzpPLzVxE&usqp=CAc",
+  "isFavorite": false
+}],
+  "dateTime": "dateTime sample"
+}
+
+
+###
+
+DELETE http://localhost:8080/order/ HTTP/1.1
