@@ -4,6 +4,6 @@ package orm
 type Order struct {
 	Model
 	Amount   string    `json:"amount"`
-	Products []Product `json:"products"`
+	Products []Product `json:"products" gorm:"many2many:order_products;"`
 	DateTime string    `json:"dateTime"`
 }
