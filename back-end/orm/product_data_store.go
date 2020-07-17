@@ -1,12 +1,31 @@
 package orm
 
 import (
+	"encoding/json"
+	"io"
+	"io/ioutil"
+
 	"github.com/jinzhu/gorm"
 )
 
 // ProductDataStore is the product data store
 type ProductDataStore struct {
 	DB *gorm.DB
+}
+
+// ParseJSON parses a JSON into a value
+func (store *ProductDataStore) ParseJSON(reqBody io.ReadCloser) (interface{}, error) {
+	body, err := ioutil.ReadAll(reqBody)
+	defer reqBody.Close()
+	if err != nil {
+		return nil, err
+	}
+	product := &Product{}
+	err = json.Unmarshal(body, product)
+	if err != nil {
+		return nil, err
+	}
+	return product, nil
 }
 
 // GetAll returns all the saved products
@@ -38,16 +57,16 @@ func (store *ProductDataStore) GetByID(id uint) (*Response, error) {
 	return response, nil
 }
 
-// Add creates a new produt
+// Add creates a new product
 func (store *ProductDataStore) Add(item interface{}) (*Response, error) {
-	product := item.(Product)
-	connection := store.DB.Create(&product)
+	product := item.(*Product)
+	connection := store.DB.Create(product)
 	if connection.Error != nil {
 		return nil, connection.Error
 	}
 	response := &Response{
 		Meta: MetaData{Rows: connection.RowsAffected},
-		Data: []Product{product},
+		Data: []Product{*product},
 	}
 	return response, nil
 }
@@ -65,10 +84,10 @@ func (store *ProductDataStore) DeleteByID(id uint) (*Response, error) {
 
 // UpdateByID updates a product based on its ID
 func (store *ProductDataStore) UpdateByID(id uint, item interface{}) (*Response, error) {
-	product := item.(Product)
+	product := item.(*Product)
 	targetProduct := Product{}
 	targetProduct.ID = id
-	connection := store.DB.Model(&targetProduct).Updates(product)
+	connection := store.DB.Model(&targetProduct).Updates(*product)
 	if connection.Error != nil {
 		return nil, connection.Error
 	}
