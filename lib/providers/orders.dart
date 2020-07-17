@@ -8,13 +8,19 @@ import '../services/order_service.dart';
 
 class Orders with ChangeNotifier {
   final OrderService orderService = GetIt.instance.get<OrderService>();
-  List<OrderItem> _orders = [];
+  List<OrderItem> _items = [];
 
-  List<OrderItem> get orders {
-    return [..._orders];
+  List<OrderItem> get items {
+    return [..._items];
   }
 
-  void addOrder(List<CartItem> cartProducts, double total) async {
+  Future<void> fetchAll() async {
+    ApiResponse response = await orderService.getAll();
+    _items = response.data;
+    notifyListeners();
+  }
+
+  Future<void> addOrder(List<CartItem> cartProducts, double total) async {
     OrderItem order = OrderItem(
       id: null,
       amount: total,
@@ -24,7 +30,7 @@ class Orders with ChangeNotifier {
     ApiResponse response = await orderService.add(order);
     OrderItem createdOrder = response.data[0];
     OrderItem newOrder = order.clone(id: createdOrder.id);
-    _orders.insert(0, newOrder);
+    _items.insert(0, newOrder);
     notifyListeners();
   }
 }
