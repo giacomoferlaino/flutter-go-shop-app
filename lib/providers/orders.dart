@@ -16,7 +16,7 @@ class Orders with ChangeNotifier {
 
   Future<void> fetchAll() async {
     ApiResponse response = await orderService.getAll();
-    _items = response.data;
+    _items = response.data.reversed.toList();
     notifyListeners();
   }
 
