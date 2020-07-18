@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shop_app/pages/auth_page.dart';
 
 import './providers/cart.dart';
 import './providers/products.dart';
@@ -59,8 +60,9 @@ class MyApp extends StatelessWidget {
           accentColor: Colors.deepOrange,
           fontFamily: 'Lato',
         ),
-        initialRoute: ProductsOverviewPage.routeName,
+        initialRoute: AuthPage.routeName,
         routes: {
+          AuthPage.routeName: (context) => AuthPage(),
           ProductsOverviewPage.routeName: (context) => ProductsOverviewPage(),
           ProductDetailPage.routeName: (context) => ProductDetailPage(),
           CartPage.routeName: (context) => CartPage(),
