@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/auth.dart';
+import '../models/auth_data.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -14,14 +18,11 @@ class AuthCard extends StatefulWidget {
 class _AuthCardState extends State<AuthCard> {
   final GlobalKey<FormState> _formKey = GlobalKey();
   AuthMode _authMode = AuthMode.Login;
-  Map<String, String> _authData = {
-    'email': '',
-    'password': '',
-  };
+  AuthData _authData = AuthData();
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
-  void _submit() {
+  void _submit() async {
     if (!_formKey.currentState.validate()) {
       // Invalid!
       return;
@@ -31,9 +32,9 @@ class _AuthCardState extends State<AuthCard> {
       _isLoading = true;
     });
     if (_authMode == AuthMode.Login) {
-      // Log user in
+      await Provider.of<Auth>(context, listen: false).login(_authData);
     } else {
-      // Sign user up
+      await Provider.of<Auth>(context, listen: false).signUp(_authData);
     }
     setState(() {
       _isLoading = false;
@@ -81,7 +82,7 @@ class _AuthCardState extends State<AuthCard> {
                     return null;
                   },
                   onSaved: (value) {
-                    _authData['email'] = value;
+                    _authData.email = value;
                   },
                 ),
                 TextFormField(
@@ -95,7 +96,7 @@ class _AuthCardState extends State<AuthCard> {
                     return null;
                   },
                   onSaved: (value) {
-                    _authData['password'] = value;
+                    _authData.password = value;
                   },
                 ),
                 if (_authMode == AuthMode.Signup)
