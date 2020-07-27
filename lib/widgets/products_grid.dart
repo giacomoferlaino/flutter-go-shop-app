@@ -38,7 +38,11 @@ class _ProductsGridState extends State<ProductsGrid> {
     });
 
     return _products.fetchAll().catchError((excetion) {
-      _snackBar.show(context: context, message: excetion.toString());
+      _snackBar.show(
+        context: context,
+        message: excetion.toString(),
+        backgroundColor: Color.fromRGBO(191, 1, 1, 0.7),
+      );
     }).then((_) {
       setState(() {
         _isLoading = false;
