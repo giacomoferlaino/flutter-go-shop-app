@@ -6,6 +6,13 @@ import '../widgets/auth_card.dart';
 
 class AuthPage extends StatelessWidget {
   static const routeName = '/auth';
+  final String onLoginRoute;
+
+  AuthPage(this.onLoginRoute);
+
+  Function onLogin(BuildContext context) {
+    Navigator.of(context).pushReplacementNamed(onLoginRoute);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +77,9 @@ class AuthPage extends StatelessWidget {
                   ),
                   Flexible(
                     flex: deviceSize.width > 600 ? 2 : 1,
-                    child: AuthCard(),
+                    child: AuthCard(
+                      onLogin: () => onLogin(context),
+                    ),
                   ),
                 ],
               ),

@@ -7,7 +7,9 @@ import '../models/auth_data.dart';
 enum AuthMode { Signup, Login }
 
 class AuthCard extends StatefulWidget {
+  final Function onLogin;
   const AuthCard({
+    @required this.onLogin,
     Key key,
   }) : super(key: key);
 
@@ -38,6 +40,7 @@ class _AuthCardState extends State<AuthCard> {
     }
     setState(() {
       _isLoading = false;
+      widget.onLogin();
     });
   }
 
