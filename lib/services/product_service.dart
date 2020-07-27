@@ -37,7 +37,7 @@ class ProductService {
       Response response = await get(_fullPath);
       return ApiResponse<Product>.parse(response, _parseProduct);
     } catch (error) {
-      throw getException(error);
+      throw handleError(error);
     }
   }
 
@@ -52,7 +52,7 @@ class ProductService {
     return ApiResponse<Product>.parse(response, _parseProduct);
   }
 
-  Exception getException(Error exception) {
+  Exception handleError(Error exception) {
     if (exception is SocketException) {
       return RequestException('Internet connection error!');
     }
