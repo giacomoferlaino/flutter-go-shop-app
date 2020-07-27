@@ -41,7 +41,7 @@ class _ProductsGridState extends State<ProductsGrid> {
       _snackBar.show(
         context: context,
         message: excetion.toString(),
-        backgroundColor: Color.fromRGBO(191, 1, 1, 0.7),
+        backgroundColor: Theme.of(context).errorColor,
       );
     }).then((_) {
       setState(() {
