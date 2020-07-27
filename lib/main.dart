@@ -18,11 +18,13 @@ import './services/product_service.dart';
 import './services/snack_bar_service.dart';
 import './services/order_service.dart';
 import './services/auth_service.dart';
+import './services/http/http_service.dart';
 
 const String baseUrl = 'http://10.0.2.2:8080';
 
 void serviceLocatorSetup() {
   GetIt serviceLocator = GetIt.instance;
+  serviceLocator.registerSingleton<HttpService>(HttpService());
   serviceLocator.registerSingleton<ProductService>(ProductService(baseUrl));
   serviceLocator.registerSingleton<OrderService>(OrderService(baseUrl));
   serviceLocator.registerSingleton<AuthService>(AuthService(baseUrl));
@@ -68,7 +70,8 @@ class MyApp extends StatelessWidget {
         ),
         initialRoute: AuthPage.routeName,
         routes: {
-          AuthPage.routeName: (context) => AuthPage(),
+          AuthPage.routeName: (context) =>
+              AuthPage(ProductsOverviewPage.routeName),
           ProductsOverviewPage.routeName: (context) => ProductsOverviewPage(),
           ProductDetailPage.routeName: (context) => ProductDetailPage(),
           CartPage.routeName: (context) => CartPage(),

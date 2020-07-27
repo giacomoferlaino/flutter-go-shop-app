@@ -1,13 +1,14 @@
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:shop_app/models/api_response.dart';
 
 import '../providers/product.dart';
-import '../models/request_exception.dart';
+import './http/http_service.dart';
 
 class ProductService {
+  final HttpService httpService = GetIt.instance.get<HttpService>();
   static const String relativePath = '/product';
   final String _baseUrl;
   String _fullPath;
@@ -28,34 +29,30 @@ class ProductService {
   }
 
   Future<ApiResponse<Product>> add(Product product) async {
-    Response response = await post(_fullPath, body: json.encode(product));
-    return ApiResponse<Product>.parse(response, _parseProduct);
+    return httpService.request<Product>(
+      request: () => post(_fullPath, body: json.encode(product)),
+      dataParsing: _parseProduct,
+    );
   }
 
   Future<ApiResponse<Product>> getAll() async {
-    try {
-      Response response = await get(_fullPath);
-      return ApiResponse<Product>.parse(response, _parseProduct);
-    } catch (error) {
-      throw handleError(error);
-    }
+    return httpService.request<Product>(
+      request: () => get(_fullPath),
+      dataParsing: _parseProduct,
+    );
   }
 
   Future<ApiResponse<Product>> deleteByID(int id) async {
-    Response response = await delete(_fullPath + '/$id');
-    return ApiResponse<Product>.parse(response, _parseProduct);
+    return httpService.request<Product>(
+      request: () => delete(_fullPath + '/$id'),
+      dataParsing: _parseProduct,
+    );
   }
 
   Future<ApiResponse<Product>> updateByID(int id, Product product) async {
-    Response response =
-        await put(_fullPath + '/$id', body: json.encode(product));
-    return ApiResponse<Product>.parse(response, _parseProduct);
-  }
-
-  Exception handleError(Error exception) {
-    if (exception is SocketException) {
-      return RequestException('Internet connection error!');
-    }
-    return RequestException('An error occured');
+    return httpService.request<Product>(
+      request: () => put(_fullPath + '/$id', body: json.encode(product)),
+      dataParsing: _parseProduct,
+    );
   }
 }
