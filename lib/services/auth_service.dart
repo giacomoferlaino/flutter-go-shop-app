@@ -19,7 +19,6 @@ class AuthService {
         data: [
           SessionData(
             idToken: 'idToken',
-            refreshToken: 'refreshToken',
             expiresIn: 60,
           ),
         ],
