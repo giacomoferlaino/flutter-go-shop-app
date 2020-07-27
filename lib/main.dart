@@ -61,24 +61,26 @@ class MyApp extends StatelessWidget {
           create: (context) => ShopFilters(),
         ),
       ],
-      child: MaterialApp(
-        title: 'MyShop',
-        theme: ThemeData(
-          primarySwatch: Colors.purple,
-          accentColor: Colors.deepOrange,
-          fontFamily: 'Lato',
+      child: Consumer<Auth>(
+        builder: (context, auth, _) => MaterialApp(
+          title: 'MyShop',
+          theme: ThemeData(
+            primarySwatch: Colors.purple,
+            accentColor: Colors.deepOrange,
+            errorColor: Color.fromRGBO(191, 1, 1, 0.7),
+            fontFamily: 'Lato',
+          ),
+          home: auth.isAuth ? ProductsOverviewPage() : AuthPage(),
+          routes: {
+            AuthPage.routeName: (context) => AuthPage(),
+            ProductsOverviewPage.routeName: (context) => ProductsOverviewPage(),
+            ProductDetailPage.routeName: (context) => ProductDetailPage(),
+            CartPage.routeName: (context) => CartPage(),
+            OrdersPage.routeName: (context) => OrdersPage(),
+            UserProductsPage.routeName: (context) => UserProductsPage(),
+            EditProductPage.routeName: (context) => EditProductPage(),
+          },
         ),
-        initialRoute: AuthPage.routeName,
-        routes: {
-          AuthPage.routeName: (context) =>
-              AuthPage(ProductsOverviewPage.routeName),
-          ProductsOverviewPage.routeName: (context) => ProductsOverviewPage(),
-          ProductDetailPage.routeName: (context) => ProductDetailPage(),
-          CartPage.routeName: (context) => CartPage(),
-          OrdersPage.routeName: (context) => OrdersPage(),
-          UserProductsPage.routeName: (context) => UserProductsPage(),
-          EditProductPage.routeName: (context) => EditProductPage(),
-        },
       ),
     );
   }

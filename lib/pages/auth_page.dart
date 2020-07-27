@@ -1,17 +1,21 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:shop_app/services/snack_bar_service.dart';
 
 import '../widgets/auth_card.dart';
 
 class AuthPage extends StatelessWidget {
+  final SnackBarService _snackBar = GetIt.instance.get<SnackBarService>();
   static const routeName = '/auth';
-  final String onLoginRoute;
 
-  AuthPage(this.onLoginRoute);
-
-  Function onLogin(BuildContext context) {
-    Navigator.of(context).pushReplacementNamed(onLoginRoute);
+  Function _onError(BuildContext context, Exception exception) {
+    _snackBar.show(
+      context: context,
+      message: exception.toString(),
+      backgroundColor: Theme.of(context).errorColor,
+    );
   }
 
   @override
@@ -78,7 +82,8 @@ class AuthPage extends StatelessWidget {
                   Flexible(
                     flex: deviceSize.width > 600 ? 2 : 1,
                     child: AuthCard(
-                      onLogin: () => onLogin(context),
+                      onError: (context, exception) =>
+                          _onError(context, exception),
                     ),
                   ),
                 ],

@@ -1,4 +1,5 @@
-import 'package:shop_app/models/session_data.dart';
+import '../models/session_data.dart';
+import '../models/api_response.dart';
 
 class AuthService {
   static const String relativePath = '/auth';
@@ -9,21 +10,28 @@ class AuthService {
     _fullPath = _baseUrl + relativePath;
   }
 
-  Future<SessionData> _authenticate(String email, String password) async {
+  Future<ApiResponse<SessionData>> _authenticate(
+      String email, String password) async {
     return Future.delayed(
       Duration(seconds: 1),
-      () => SessionData(
-        idToken: 'idTokenMock',
-        refreshToken: 'refreshTokenMock',
+      () => ApiResponse<SessionData>(
+        meta: MetaData(0, null),
+        data: [
+          SessionData(
+            idToken: 'idToken',
+            refreshToken: 'refreshToken',
+            expiresIn: 60,
+          ),
+        ],
       ),
     );
   }
 
-  Future<SessionData> signUp(String email, String password) async {
+  Future<ApiResponse<SessionData>> signUp(String email, String password) async {
     return _authenticate(email, password);
   }
 
-  Future<SessionData> login(String email, String password) async {
+  Future<ApiResponse<SessionData>> login(String email, String password) async {
     return _authenticate(email, password);
   }
 }

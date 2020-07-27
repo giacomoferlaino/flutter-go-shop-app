@@ -7,9 +7,10 @@ import '../models/auth_data.dart';
 enum AuthMode { Signup, Login }
 
 class AuthCard extends StatefulWidget {
-  final Function onLogin;
+  final Function(BuildContext context, Exception exception) onError;
+
   const AuthCard({
-    @required this.onLogin,
+    @required this.onError,
     Key key,
   }) : super(key: key);
 
@@ -33,15 +34,21 @@ class _AuthCardState extends State<AuthCard> {
     setState(() {
       _isLoading = true;
     });
-    if (_authMode == AuthMode.Login) {
-      await Provider.of<Auth>(context, listen: false).login(_authData);
-    } else {
-      await Provider.of<Auth>(context, listen: false).signUp(_authData);
+    try {
+      if (_authMode == AuthMode.Login) {
+        await Provider.of<Auth>(context, listen: false).login(_authData);
+      } else {
+        await Provider.of<Auth>(context, listen: false).signUp(_authData);
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+        widget.onError(context, error);
+      });
     }
-    setState(() {
-      _isLoading = false;
-      widget.onLogin();
-    });
   }
 
   void _switchAuthMode() {
