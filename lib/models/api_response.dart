@@ -2,14 +2,15 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 
-class _MetaData {
+class MetaData {
   final int rows;
+  final String error;
 
-  _MetaData(this.rows);
+  MetaData(this.rows, this.error);
 }
 
 class ApiResponse<T> {
-  _MetaData meta;
+  MetaData meta;
   List<T> data;
 
   ApiResponse({this.meta, this.data});
@@ -19,7 +20,10 @@ class ApiResponse<T> {
     T Function(dynamic item) parseObject,
   ) {
     final decodedResponse = json.decode(response.body);
-    meta = _MetaData(decodedResponse['meta']['rows']);
+    meta = MetaData(
+      decodedResponse['meta']['rows'],
+      decodedResponse['meta']['error'],
+    );
     if (decodedResponse['data'] == null) {
       data = null;
     } else {

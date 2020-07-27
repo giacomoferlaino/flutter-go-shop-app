@@ -6,7 +6,8 @@ import (
 
 // MetaData contains a sql query metadata
 type MetaData struct {
-	Rows int64 `json:"rows"`
+	Rows  int64  `json:"rows"`
+	Error string `json:"error"`
 }
 
 // Response is the ORM response data model
