@@ -28,13 +28,13 @@ func (handler *HTTPCRUDHandler) Get(res http.ResponseWriter, req *http.Request, 
 	items, rowsAffected, err := handler.store.GetAll()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	apiResponse, err := json.Marshal(api.NewSuccessResponse(items, rowsAffected))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	res.WriteHeader(http.StatusOK)
@@ -46,19 +46,19 @@ func (handler *HTTPCRUDHandler) Post(res http.ResponseWriter, req *http.Request,
 	newItem, err := handler.store.ParseJSON(req.Body)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	items, rowsAffected, err := handler.store.Add(newItem)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	apiResponse, err := json.Marshal(api.NewSuccessResponse(items, rowsAffected))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	res.WriteHeader(http.StatusOK)
@@ -70,19 +70,19 @@ func (handler *HTTPCRUDHandler) GetByID(res http.ResponseWriter, req *http.Reque
 	id, err := strconv.ParseUint(params.ByName("id"), 10, 64)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	items, rowsAffeected, err := handler.store.GetByID(uint(id))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	apiResponse, err := json.Marshal(api.NewSuccessResponse(items, rowsAffeected))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	res.WriteHeader(http.StatusOK)
@@ -94,19 +94,19 @@ func (handler *HTTPCRUDHandler) DeleteByID(res http.ResponseWriter, req *http.Re
 	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	rowsAffected, err := handler.store.DeleteByID(uint(id))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	apiResponse, err := json.Marshal(api.NewSuccessResponse(nil, rowsAffected))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	res.WriteHeader(http.StatusOK)
@@ -118,25 +118,25 @@ func (handler *HTTPCRUDHandler) UpdateByID(res http.ResponseWriter, req *http.Re
 	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	item, err := handler.store.ParseJSON(req.Body)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	items, rowsAffected, err := handler.store.UpdateByID(uint(id), item)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	apiResponse, err := json.Marshal(api.NewSuccessResponse(items, rowsAffected))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
 	res.WriteHeader(http.StatusOK)
