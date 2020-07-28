@@ -29,78 +29,63 @@ func (store *OrderDataStore) ParseJSON(reqBody io.ReadCloser) (interface{}, erro
 }
 
 // GetAll returns all the saved orders
-func (store *OrderDataStore) GetAll() (*Response, error) {
+func (store *OrderDataStore) GetAll() (interface{}, int64, error) {
 	orders := []Order{}
 	connection := store.DB.Preload("CartItems.Product").Find(&orders)
-	response := &Response{
-		Meta: MetaData{Rows: connection.RowsAffected},
-	}
 	if connection.RecordNotFound() {
-		return response, nil
+		return nil, connection.RowsAffected, nil
 	}
 	if connection.Error != nil {
-		return nil, connection.Error
+		return nil, connection.RowsAffected, connection.Error
 	}
-	response.Data = orders
-	return response, nil
+	return orders, connection.RowsAffected, nil
 }
 
 // GetByID returns a order based on its ID
-func (store *OrderDataStore) GetByID(id uint) (*Response, error) {
+func (store *OrderDataStore) GetByID(id uint) (interface{}, int64, error) {
 	order := Order{}
 	connection := store.DB.Preload("CartItems.Product").First(&order, id)
-	response := &Response{Meta: MetaData{Rows: connection.RowsAffected}}
 	if connection.RecordNotFound() {
-		return response, nil
+		return nil, connection.RowsAffected, nil
 	}
 	if connection.Error != nil {
-		return nil, connection.Error
+		return nil, connection.RowsAffected, connection.Error
 	}
-	response.Data = []Order{order}
-	return response, nil
+	return []Order{order}, connection.RowsAffected, nil
 }
 
 // Add creates a new order
-func (store *OrderDataStore) Add(item interface{}) (*Response, error) {
+func (store *OrderDataStore) Add(item interface{}) (interface{}, int64, error) {
 	order := item.(*Order)
 	connection := store.DB.Create(order)
 	if connection.Error != nil {
-		return nil, connection.Error
+		return nil, connection.RowsAffected, connection.Error
 	}
-	response := &Response{
-		Meta: MetaData{Rows: connection.RowsAffected},
-		Data: []Order{*order},
-	}
-	return response, nil
+	return []Order{*order}, connection.RowsAffected, nil
 }
 
 // DeleteByID removes a order based in its ID
-func (store *OrderDataStore) DeleteByID(id uint) (*Response, error) {
+func (store *OrderDataStore) DeleteByID(id uint) (int64, error) {
 	order := Order{Model: Model{ID: id}}
 	connection := store.DB.Delete(&order)
 	if connection.Error != nil {
-		return nil, connection.Error
+		return connection.RowsAffected, connection.Error
 	}
 	connection.Model(&order).Association("CartItems").Clear()
 	if connection.Error != nil {
-		return nil, connection.Error
+		return connection.RowsAffected, connection.Error
 	}
-	response := &Response{Meta: MetaData{Rows: connection.RowsAffected}}
-	return response, nil
+	return connection.RowsAffected, nil
 }
 
 // UpdateByID updates a order based on its ID
-func (store *OrderDataStore) UpdateByID(id uint, item interface{}) (*Response, error) {
+func (store *OrderDataStore) UpdateByID(id uint, item interface{}) (interface{}, int64, error) {
 	order := item.(*Order)
 	order.ID = id
 	connection := store.DB.Save(order)
 	connection.Model(order).Association("CartItems").Replace(order.CartItems)
 	if connection.Error != nil {
-		return nil, connection.Error
+		return nil, connection.RowsAffected, connection.Error
 	}
-	response := &Response{
-		Meta: MetaData{Rows: connection.RowsAffected},
-		Data: []Order{*order},
-	}
-	return response, nil
+	return []Order{*order}, connection.RowsAffected, nil
 }

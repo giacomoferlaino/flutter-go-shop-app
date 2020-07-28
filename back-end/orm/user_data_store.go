@@ -29,71 +29,56 @@ func (store *UserDataStore) ParseJSON(reqBody io.ReadCloser) (interface{}, error
 }
 
 // GetAll returns all the saved users
-func (store *UserDataStore) GetAll() (*Response, error) {
+func (store *UserDataStore) GetAll() (interface{}, int64, error) {
 	users := []User{}
 	connection := store.DB.Find(&users)
 	if connection.Error != nil {
-		return nil, connection.Error
+		return nil, connection.RowsAffected, connection.Error
 	}
-	response := &Response{
-		Meta: MetaData{Rows: connection.RowsAffected},
-		Data: users,
-	}
-	return response, nil
+	return users, connection.RowsAffected, nil
 }
 
 // GetByID returns a user based on its ID
-func (store *UserDataStore) GetByID(id uint) (*Response, error) {
+func (store *UserDataStore) GetByID(id uint) (interface{}, int64, error) {
 	user := User{}
 	connection := store.DB.First(&user, id)
-	response := &Response{Meta: MetaData{Rows: connection.RowsAffected}}
 	if connection.RecordNotFound() {
-		return response, nil
+		return nil, connection.RowsAffected, nil
 	}
 	if connection.Error != nil {
-		return nil, connection.Error
+		return nil, connection.RowsAffected, connection.Error
 	}
-	response.Data = []User{user}
-	return response, nil
+	return []User{user}, connection.RowsAffected, nil
 }
 
 // Add creates a new user
-func (store *UserDataStore) Add(item interface{}) (*Response, error) {
+func (store *UserDataStore) Add(item interface{}) (interface{}, int64, error) {
 	user := item.(*User)
 	connection := store.DB.Create(user)
 	if connection.Error != nil {
-		return nil, connection.Error
+		return nil, connection.RowsAffected, connection.Error
 	}
-	response := &Response{
-		Meta: MetaData{Rows: connection.RowsAffected},
-		Data: []User{*user},
-	}
-	return response, nil
+	return []User{*user}, connection.RowsAffected, nil
 }
 
 // DeleteByID removes a user based in its ID
-func (store *UserDataStore) DeleteByID(id uint) (*Response, error) {
+func (store *UserDataStore) DeleteByID(id uint) (int64, error) {
 	user := User{Model: Model{ID: id}}
 	connection := store.DB.Delete(&user)
 	if connection.Error != nil {
-		return nil, connection.Error
+		return connection.RowsAffected, connection.Error
 	}
-	response := &Response{Meta: MetaData{Rows: connection.RowsAffected}}
-	return response, nil
+	return connection.RowsAffected, nil
 }
 
 // UpdateByID updates a user based on its ID
-func (store *UserDataStore) UpdateByID(id uint, item interface{}) (*Response, error) {
+func (store *UserDataStore) UpdateByID(id uint, item interface{}) (interface{}, int64, error) {
 	user := item.(*User)
 	targetUser := User{}
 	targetUser.ID = id
 	connection := store.DB.Model(&targetUser).Updates(*user)
 	if connection.Error != nil {
-		return nil, connection.Error
+		return nil, connection.RowsAffected, connection.Error
 	}
-	response := &Response{
-		Meta: MetaData{Rows: connection.RowsAffected},
-		Data: []User{targetUser},
-	}
-	return response, nil
+	return []User{targetUser}, connection.RowsAffected, nil
 }

@@ -1,13 +1,15 @@
 package orm
 
-import "io"
+import (
+	"io"
+)
 
 // DataStore contains the methods that all the data store has to implement
 type DataStore interface {
 	ParseJSON(reqBody io.ReadCloser) (interface{}, error)
-	GetAll() (*Response, error)
-	GetByID(id uint) (*Response, error)
-	Add(item interface{}) (*Response, error)
-	DeleteByID(id uint) (*Response, error)
-	UpdateByID(id uint, item interface{}) (*Response, error)
+	GetAll() (interface{}, int64, error)
+	GetByID(id uint) (interface{}, int64, error)
+	Add(item interface{}) (interface{}, int64, error)
+	DeleteByID(id uint) (int64, error)
+	UpdateByID(id uint, item interface{}) (interface{}, int64, error)
 }

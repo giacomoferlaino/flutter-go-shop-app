@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flutter_shop_app/api"
 	"flutter_shop_app/app"
 	"flutter_shop_app/orm"
 	"fmt"
@@ -24,16 +25,16 @@ type HTTPCRUDHandler struct {
 
 // Get returns all saved items
 func (handler *HTTPCRUDHandler) Get(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	queryResponse, err := handler.store.GetAll()
+	items, rowsAffected, err := handler.store.GetAll()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
-	apiResponse, err := json.Marshal(queryResponse)
+	apiResponse, err := json.Marshal(api.NewSuccessResponse(items, rowsAffected))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
 	res.WriteHeader(http.StatusOK)
@@ -45,19 +46,19 @@ func (handler *HTTPCRUDHandler) Post(res http.ResponseWriter, req *http.Request,
 	newItem, err := handler.store.ParseJSON(req.Body)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
-	queryResponse, err := handler.store.Add(newItem)
+	items, rowsAffected, err := handler.store.Add(newItem)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
-	apiResponse, err := json.Marshal(queryResponse)
+	apiResponse, err := json.Marshal(api.NewSuccessResponse(items, rowsAffected))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
 	res.WriteHeader(http.StatusOK)
@@ -69,19 +70,19 @@ func (handler *HTTPCRUDHandler) GetByID(res http.ResponseWriter, req *http.Reque
 	id, err := strconv.ParseUint(params.ByName("id"), 10, 64)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
-	queryResponse, err := handler.store.GetByID(uint(id))
+	items, rowsAffeected, err := handler.store.GetByID(uint(id))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
-	apiResponse, err := json.Marshal(queryResponse)
+	apiResponse, err := json.Marshal(api.NewSuccessResponse(items, rowsAffeected))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
 	res.WriteHeader(http.StatusOK)
@@ -93,19 +94,19 @@ func (handler *HTTPCRUDHandler) DeleteByID(res http.ResponseWriter, req *http.Re
 	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
-	queryResponse, err := handler.store.DeleteByID(uint(id))
+	rowsAffected, err := handler.store.DeleteByID(uint(id))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
-	apiResponse, err := json.Marshal(queryResponse)
+	apiResponse, err := json.Marshal(api.NewSuccessResponse(nil, rowsAffected))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
 	res.WriteHeader(http.StatusOK)
@@ -117,25 +118,25 @@ func (handler *HTTPCRUDHandler) UpdateByID(res http.ResponseWriter, req *http.Re
 	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
 	item, err := handler.store.ParseJSON(req.Body)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
-	queryResponse, err := handler.store.UpdateByID(uint(id), item)
+	items, rowsAffected, err := handler.store.UpdateByID(uint(id), item)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
-	apiResponse, err := json.Marshal(queryResponse)
+	apiResponse, err := json.Marshal(api.NewSuccessResponse(items, rowsAffected))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(res, err)
+		fmt.Fprint(res, api.NewErrorResponse(err.Error()))
 		return
 	}
 	res.WriteHeader(http.StatusOK)

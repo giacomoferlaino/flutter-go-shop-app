@@ -29,71 +29,56 @@ func (store *ProductDataStore) ParseJSON(reqBody io.ReadCloser) (interface{}, er
 }
 
 // GetAll returns all the saved products
-func (store *ProductDataStore) GetAll() (*Response, error) {
+func (store *ProductDataStore) GetAll() (interface{}, int64, error) {
 	products := []Product{}
 	connection := store.DB.Find(&products)
 	if connection.Error != nil {
-		return nil, connection.Error
+		return nil, connection.RowsAffected, connection.Error
 	}
-	response := &Response{
-		Meta: MetaData{Rows: connection.RowsAffected},
-		Data: products,
-	}
-	return response, nil
+	return products, connection.RowsAffected, nil
 }
 
 // GetByID returns a product based on its ID
-func (store *ProductDataStore) GetByID(id uint) (*Response, error) {
+func (store *ProductDataStore) GetByID(id uint) (interface{}, int64, error) {
 	product := Product{}
 	connection := store.DB.First(&product, id)
-	response := &Response{Meta: MetaData{Rows: connection.RowsAffected}}
 	if connection.RecordNotFound() {
-		return response, nil
+		return nil, connection.RowsAffected, nil
 	}
 	if connection.Error != nil {
-		return nil, connection.Error
+		return nil, connection.RowsAffected, connection.Error
 	}
-	response.Data = []Product{product}
-	return response, nil
+	return []Product{product}, connection.RowsAffected, nil
 }
 
 // Add creates a new product
-func (store *ProductDataStore) Add(item interface{}) (*Response, error) {
+func (store *ProductDataStore) Add(item interface{}) (interface{}, int64, error) {
 	product := item.(*Product)
 	connection := store.DB.Create(product)
 	if connection.Error != nil {
-		return nil, connection.Error
+		return nil, connection.RowsAffected, connection.Error
 	}
-	response := &Response{
-		Meta: MetaData{Rows: connection.RowsAffected},
-		Data: []Product{*product},
-	}
-	return response, nil
+	return []Product{*product}, connection.RowsAffected, nil
 }
 
 // DeleteByID removes a product based in its ID
-func (store *ProductDataStore) DeleteByID(id uint) (*Response, error) {
+func (store *ProductDataStore) DeleteByID(id uint) (int64, error) {
 	product := Product{Model: Model{ID: id}}
 	connection := store.DB.Delete(&product)
 	if connection.Error != nil {
-		return nil, connection.Error
+		return connection.RowsAffected, connection.Error
 	}
-	response := &Response{Meta: MetaData{Rows: connection.RowsAffected}}
-	return response, nil
+	return connection.RowsAffected, nil
 }
 
 // UpdateByID updates a product based on its ID
-func (store *ProductDataStore) UpdateByID(id uint, item interface{}) (*Response, error) {
+func (store *ProductDataStore) UpdateByID(id uint, item interface{}) (interface{}, int64, error) {
 	product := item.(*Product)
 	targetProduct := Product{}
 	targetProduct.ID = id
 	connection := store.DB.Model(&targetProduct).Updates(*product)
 	if connection.Error != nil {
-		return nil, connection.Error
+		return nil, connection.RowsAffected, connection.Error
 	}
-	response := &Response{
-		Meta: MetaData{Rows: connection.RowsAffected},
-		Data: []Product{targetProduct},
-	}
-	return response, nil
+	return []Product{targetProduct}, connection.RowsAffected, nil
 }
