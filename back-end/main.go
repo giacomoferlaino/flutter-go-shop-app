@@ -21,8 +21,8 @@ func main() {
 	app := app.State{
 		Database: db,
 	}
-	productHandler := NewHandler(app, &orm.ProductDataStore{DB: app.Database})
-	orderHandler := NewHandler(app, &orm.OrderDataStore{DB: app.Database})
+	productHandler := NewHTTPCRUDHandler(app, &orm.ProductDataStore{DB: app.Database})
+	orderHandler := NewHTTPCRUDHandler(app, &orm.OrderDataStore{DB: app.Database})
 	router := httprouter.New()
 	router.GET("/product", productHandler.Get)
 	router.POST("/product", productHandler.Post)

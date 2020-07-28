@@ -11,19 +11,19 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// NewHandler returns a new Handler
-func NewHandler(app app.State, dataStore orm.DataStore) *Handler {
-	return &Handler{app: app, store: dataStore}
+// NewHTTPCRUDHandler returns a new http Handler to manage CRUD request
+func NewHTTPCRUDHandler(app app.State, dataStore orm.DataStore) *HTTPCRUDHandler {
+	return &HTTPCRUDHandler{app: app, store: dataStore}
 }
 
-// Handler contains the HTTP endpoint handlers
-type Handler struct {
+// HTTPCRUDHandler contains the HTTP endpoint CRUD handlers
+type HTTPCRUDHandler struct {
 	app   app.State
 	store orm.DataStore
 }
 
 // Get returns all saved items
-func (handler *Handler) Get(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func (handler *HTTPCRUDHandler) Get(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	queryResponse, err := handler.store.GetAll()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
@@ -41,7 +41,7 @@ func (handler *Handler) Get(res http.ResponseWriter, req *http.Request, _ httpro
 }
 
 // Post saves a new item
-func (handler *Handler) Post(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func (handler *HTTPCRUDHandler) Post(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	newItem, err := handler.store.ParseJSON(req.Body)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
@@ -65,7 +65,7 @@ func (handler *Handler) Post(res http.ResponseWriter, req *http.Request, _ httpr
 }
 
 // GetByID returns a item based on its ID
-func (handler *Handler) GetByID(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+func (handler *HTTPCRUDHandler) GetByID(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	id, err := strconv.ParseUint(params.ByName("id"), 10, 64)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
@@ -89,7 +89,7 @@ func (handler *Handler) GetByID(res http.ResponseWriter, req *http.Request, para
 }
 
 // DeleteByID delete an item based on its ID
-func (handler *Handler) DeleteByID(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+func (handler *HTTPCRUDHandler) DeleteByID(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
@@ -113,7 +113,7 @@ func (handler *Handler) DeleteByID(res http.ResponseWriter, req *http.Request, p
 }
 
 // UpdateByID update an items based on its ID
-func (handler *Handler) UpdateByID(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+func (handler *HTTPCRUDHandler) UpdateByID(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	id, err := strconv.ParseInt(params.ByName("id"), 10, 64)
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
