@@ -84,7 +84,7 @@ func (handler *HTTPHandler) Login(res http.ResponseWriter, req *http.Request, _ 
 		IDToken:   token,
 		ExpiresIn: handler.jwtManager.expiredIn,
 	}
-	apiResponse, err := json.Marshal(api.NewSuccessResponse(sessionData, 0))
+	apiResponse, err := json.Marshal(api.NewSuccessResponse([]SessionData{sessionData}, 0))
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
