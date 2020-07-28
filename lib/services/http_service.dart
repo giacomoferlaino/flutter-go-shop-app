@@ -13,13 +13,21 @@ class HttpService {
   }) async {
     try {
       http.Response response = await request();
-      return ApiResponse<T>.parse(response, dataParsing);
+      ApiResponse<T> apiResponse = ApiResponse<T>.parse(response, dataParsing);
+      String error = apiResponse.meta.error;
+      if (error != null && error != '') {
+        throw RequestException(error);
+      }
+      return apiResponse;
     } catch (error) {
       throw _handleError(error);
     }
   }
 
-  Exception _handleError(Exception exception) {
+  Exception _handleError(dynamic exception) {
+    if (exception is RequestException) {
+      return exception;
+    }
     if (exception is SocketException) {
       return RequestException('Unable to contact the server.');
     }
