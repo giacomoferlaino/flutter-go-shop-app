@@ -1,8 +1,23 @@
-package orm
+package api
 
 import (
 	"encoding/json"
 )
+
+// NewSuccessResponse return a new http success response
+func NewSuccessResponse(data interface{}, rows int64) *Response {
+	return &Response{
+		Meta: MetaData{Rows: rows},
+		Data: data,
+	}
+}
+
+// NewErrorResponse return a new http error response
+func NewErrorResponse(error string) *Response {
+	return &Response{
+		Meta: MetaData{Error: error},
+	}
+}
 
 // MetaData contains a sql query metadata
 type MetaData struct {
