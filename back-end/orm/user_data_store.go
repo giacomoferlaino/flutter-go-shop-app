@@ -1,9 +1,8 @@
 package orm
 
 import (
-	"encoding/json"
+	"flutter_shop_app/api"
 	"io"
-	"io/ioutil"
 
 	"github.com/jinzhu/gorm"
 )
@@ -15,17 +14,7 @@ type UserDataStore struct {
 
 // ParseJSON parses a JSON into a value
 func (store *UserDataStore) ParseJSON(reqBody io.ReadCloser) (interface{}, error) {
-	body, err := ioutil.ReadAll(reqBody)
-	defer reqBody.Close()
-	if err != nil {
-		return nil, err
-	}
-	user := &User{}
-	err = json.Unmarshal(body, user)
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
+	return api.ParseJSON(reqBody, &User{})
 }
 
 // GetAll returns all the saved users
