@@ -67,8 +67,8 @@ func (handler *HTTPHandler) Login(res http.ResponseWriter, req *http.Request, _ 
 		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
 		return
 	}
-	user := data.([]orm.User)[0]
-	if user.Passwod != loginData.Password {
+	users, ok := data.([]orm.User)
+	if !ok || users[0].Password != loginData.Password {
 		err = errors.New("Invalid credentials")
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(res, api.NewErrorResponse(err.Error()).ToJSON())
