@@ -31,7 +31,13 @@ type Response struct {
 	Data interface{} `json:"data"`
 }
 
-// MarshalJSON returns the response in text format
+// ToJSON return the response in string format
+func (response *Response) ToJSON() string {
+	bs, _ := response.MarshalJSON()
+	return string(bs)
+}
+
+// MarshalJSON is the custom implementation of the json marshaling for the response data model
 func (response *Response) MarshalJSON() ([]byte, error) {
 	return json.Marshal(*response)
 }

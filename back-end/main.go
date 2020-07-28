@@ -2,6 +2,7 @@ package main
 
 import (
 	"flutter_shop_app/app"
+	"flutter_shop_app/auth"
 	"flutter_shop_app/orm"
 	"log"
 	"net/http"
@@ -21,6 +22,7 @@ func main() {
 	app := app.State{
 		Database: db,
 	}
+	authHandler := auth.NewHTTPHandler(app, &orm.UserDataStore{DB: app.Database})
 	productHandler := NewHTTPCRUDHandler(app, &orm.ProductDataStore{DB: app.Database})
 	orderHandler := NewHTTPCRUDHandler(app, &orm.OrderDataStore{DB: app.Database})
 	router := httprouter.New()
@@ -35,6 +37,9 @@ func main() {
 	router.GET("/order/:id", orderHandler.GetByID)
 	router.PUT("/order/:id", orderHandler.UpdateByID)
 	router.DELETE("/order/:id", orderHandler.DeleteByID)
+
+	router.POST("/auth/signup", authHandler.SignUp)
+	router.POST("/auth/login", authHandler.Login)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
