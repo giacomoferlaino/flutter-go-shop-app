@@ -5,6 +5,6 @@ type User struct {
 	Model
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
-	UserName  string `json:"username" gorm:"unique"`
+	Email     string `json:"email" gorm:"unique"`
 	Passwod   string `json:"password"`
 }
