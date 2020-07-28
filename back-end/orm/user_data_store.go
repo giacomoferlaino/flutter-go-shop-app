@@ -40,6 +40,19 @@ func (store *UserDataStore) GetByID(id uint) (interface{}, int64, error) {
 	return []User{user}, connection.RowsAffected, nil
 }
 
+// GetByEmail returns a user based on its ID
+func (store *UserDataStore) GetByEmail(email string) (interface{}, int64, error) {
+	user := User{}
+	connection := store.DB.Where(&User{Email: email}).First(&user)
+	if connection.RecordNotFound() {
+		return nil, connection.RowsAffected, nil
+	}
+	if connection.Error != nil {
+		return nil, connection.RowsAffected, connection.Error
+	}
+	return []User{user}, connection.RowsAffected, nil
+}
+
 // Add creates a new user
 func (store *UserDataStore) Add(item interface{}) (interface{}, int64, error) {
 	user := item.(*User)
