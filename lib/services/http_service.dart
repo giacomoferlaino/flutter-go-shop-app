@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-import '../../models/api_response.dart';
-import '../../models/request_exception.dart';
+import '../models/api_response.dart';
+import '../models/request_exception.dart';
 
 class HttpService {
   Future<ApiResponse<T>> request<T>({

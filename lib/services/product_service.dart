@@ -5,7 +5,7 @@ import 'package:http/http.dart';
 import 'package:shop_app/models/api_response.dart';
 
 import '../providers/product.dart';
-import './http/http_service.dart';
+import 'http_service.dart';
 
 class ProductService {
   final HttpService httpService = GetIt.instance.get<HttpService>();

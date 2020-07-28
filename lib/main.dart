@@ -18,7 +18,7 @@ import './services/product_service.dart';
 import './services/snack_bar_service.dart';
 import './services/order_service.dart';
 import './services/auth_service.dart';
-import './services/http/http_service.dart';
+import 'services/http_service.dart';
 
 const String baseUrl = 'http://10.0.2.2:8080';
 
