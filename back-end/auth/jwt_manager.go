@@ -6,22 +6,25 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-func newJwtManager(signingKey string) *jwtManager {
-	return &jwtManager{
-		signingKey: []byte(signingKey),
-		expiredIn:  24 * 60 * 60,
+// NewJwtManager return a new jwt manager
+func NewJwtManager(signingKey string) *JwtManager {
+	return &JwtManager{
+		SigningKey: []byte(signingKey),
+		ExpiredIn:  24 * 60 * 60,
 	}
 }
 
-type jwtManager struct {
-	signingKey []byte
-	expiredIn  uint64
+// JwtManager is used to managed JWT for authentication
+type JwtManager struct {
+	SigningKey []byte
+	ExpiredIn  uint64
 }
 
-func (manager *jwtManager) createToken() (string, error) {
+// CreateToken returns a new JWT
+func (manager *JwtManager) CreateToken() (string, error) {
 	claims := &jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(time.Second * time.Duration(manager.expiredIn)).Unix(),
+		ExpiresAt: time.Now().Add(time.Second * time.Duration(manager.ExpiredIn)).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(manager.signingKey)
+	return token.SignedString(manager.SigningKey)
 }

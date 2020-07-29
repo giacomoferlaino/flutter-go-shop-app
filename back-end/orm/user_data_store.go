@@ -1,20 +1,12 @@
 package orm
 
 import (
-	"flutter_shop_app/api"
-	"io"
-
 	"github.com/jinzhu/gorm"
 )
 
 // UserDataStore is the user data store
 type UserDataStore struct {
 	DB *gorm.DB
-}
-
-// ParseJSON parses a JSON into a value
-func (store *UserDataStore) ParseJSON(reqBody io.ReadCloser) (interface{}, error) {
-	return api.ParseJSON(reqBody, &User{})
 }
 
 // GetAll returns all the saved users

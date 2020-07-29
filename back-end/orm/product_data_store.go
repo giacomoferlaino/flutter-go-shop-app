@@ -1,20 +1,12 @@
 package orm
 
 import (
-	"flutter_shop_app/api"
-	"io"
-
 	"github.com/jinzhu/gorm"
 )
 
 // ProductDataStore is the product data store
 type ProductDataStore struct {
 	DB *gorm.DB
-}
-
-// ParseJSON parses a JSON into a value
-func (store *ProductDataStore) ParseJSON(reqBody io.ReadCloser) (interface{}, error) {
-	return api.ParseJSON(reqBody, &Product{})
 }
 
 // GetAll returns all the saved products
