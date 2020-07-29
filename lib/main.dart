@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
 
+import './models/url.dart';
 import './providers/cart.dart';
 import './providers/products.dart';
 import './providers/orders.dart';
@@ -18,16 +19,36 @@ import './services/product_service.dart';
 import './services/snack_bar_service.dart';
 import './services/order_service.dart';
 import './services/auth_service.dart';
-import 'services/http_service.dart';
+import './services/http_service.dart';
 
-const String baseUrl = 'http://10.0.2.2:8080';
+final Url baseUrl = Url(
+  scheme: 'http',
+  host: '10.0.2.2',
+  port: 8080,
+);
+
+final httpService = HttpService();
+final authService = AuthService(
+  httpService,
+  baseUrl,
+);
+final productService = ProductService(
+  httpService,
+  authService,
+  baseUrl,
+);
+final orderService = OrderService(
+  httpService,
+  authService,
+  baseUrl,
+);
 
 void serviceLocatorSetup() {
   GetIt serviceLocator = GetIt.instance;
-  serviceLocator.registerSingleton<HttpService>(HttpService());
-  serviceLocator.registerSingleton<ProductService>(ProductService(baseUrl));
-  serviceLocator.registerSingleton<OrderService>(OrderService(baseUrl));
-  serviceLocator.registerSingleton<AuthService>(AuthService(baseUrl));
+  serviceLocator.registerSingleton<AuthService>(authService);
+  serviceLocator.registerSingleton<HttpService>(httpService);
+  serviceLocator.registerSingleton<ProductService>(productService);
+  serviceLocator.registerSingleton<OrderService>(orderService);
   serviceLocator.registerSingleton<SnackBarService>(
     SnackBarService(
       duration: Duration(seconds: 2),
@@ -41,6 +62,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  final AuthService authService = GetIt.instance.get<AuthService>();
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -70,7 +92,7 @@ class MyApp extends StatelessWidget {
             errorColor: Color.fromRGBO(191, 1, 1, 0.7),
             fontFamily: 'Lato',
           ),
-          home: auth.isAuth ? ProductsOverviewPage() : AuthPage(),
+          home: authService.isAuth ? ProductsOverviewPage() : AuthPage(),
           routes: {
             AuthPage.routeName: (context) => AuthPage(),
             ProductsOverviewPage.routeName: (context) => ProductsOverviewPage(),

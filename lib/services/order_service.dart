@@ -1,22 +1,22 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart';
 
 import '../models/order_item.dart';
-import '../models/request_exception.dart';
 import '../models/api_response.dart';
 import '../models/cart_item.dart';
+import '../models/url.dart';
 import '../providers/product.dart';
+import './auth_service.dart';
+import './http_service.dart';
 
 class OrderService {
+  final HttpService httpService;
+  final AuthService authService;
   static const String relativePath = '/order';
-  final String _baseUrl;
-  String _fullPath;
+  final Url _baseUrl;
 
-  OrderService(this._baseUrl) {
-    _fullPath = _baseUrl + relativePath;
-  }
+  OrderService(this.httpService, this.authService, this._baseUrl);
 
   OrderItem _parseOrder(dynamic item) {
     final List<CartItem> cartItems = [];
@@ -42,35 +42,77 @@ class OrderService {
     );
   }
 
-  Future<ApiResponse<OrderItem>> add(OrderItem order) async {
-    Response response = await post(_fullPath, body: json.encode(order));
-    return ApiResponse<OrderItem>.parse(response, _parseOrder);
+  Future<ApiResponse<OrderItem>> add(
+    OrderItem order,
+  ) async {
+    final Uri uri = Uri(
+      scheme: _baseUrl.scheme,
+      host: _baseUrl.host,
+      port: _baseUrl.port,
+      path: relativePath,
+    );
+    return httpService.request(
+      request: () => post(
+        uri,
+        body: json.encode(order),
+        headers: {'Authorization': this.authService.token},
+      ),
+      dataParsing: _parseOrder,
+    );
   }
 
   Future<ApiResponse<OrderItem>> getAll() async {
-    try {
-      Response response = await get(_fullPath);
-      return ApiResponse<OrderItem>.parse(response, _parseOrder);
-    } catch (error) {
-      throw getException(error);
-    }
+    final Uri uri = Uri(
+      scheme: _baseUrl.scheme,
+      host: _baseUrl.host,
+      port: _baseUrl.port,
+      path: relativePath,
+    );
+    return httpService.request(
+      request: () => get(
+        uri,
+        headers: {'Authorization': this.authService.token},
+      ),
+      dataParsing: _parseOrder,
+    );
   }
 
-  Future<ApiResponse<OrderItem>> deleteByID(int id) async {
-    Response response = await delete(_fullPath + '/$id');
-    return ApiResponse<OrderItem>.parse(response, _parseOrder);
+  Future<ApiResponse<OrderItem>> deleteByID(
+    int id,
+  ) async {
+    final Uri uri = Uri(
+      scheme: _baseUrl.scheme,
+      host: _baseUrl.host,
+      port: _baseUrl.port,
+      path: relativePath,
+      queryParameters: {'id': id},
+    );
+    return httpService.request(
+        request: () => delete(
+              uri,
+              headers: {'Authorization': this.authService.token},
+            ),
+        dataParsing: _parseOrder);
   }
 
-  Future<ApiResponse<OrderItem>> updateByID(int id, OrderItem product) async {
-    Response response =
-        await put(_fullPath + '/$id', body: json.encode(product));
-    return ApiResponse<OrderItem>.parse(response, _parseOrder);
-  }
-
-  Exception getException(Exception exception) {
-    if (exception is SocketException) {
-      return RequestException('Internet connection error!');
-    }
-    return RequestException('An error occured');
+  Future<ApiResponse<OrderItem>> updateByID(
+    int id,
+    OrderItem product,
+  ) async {
+    final Uri uri = Uri(
+      scheme: _baseUrl.scheme,
+      host: _baseUrl.host,
+      port: _baseUrl.port,
+      path: relativePath,
+      queryParameters: {'id': id},
+    );
+    return httpService.request(
+      request: () => put(
+        uri,
+        body: json.encode(product),
+        headers: {'Authorization': this.authService.token},
+      ),
+      dataParsing: _parseOrder,
+    );
   }
 }

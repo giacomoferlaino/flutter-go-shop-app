@@ -1,21 +1,20 @@
 import 'dart:convert';
 
-import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
-import 'package:shop_app/models/api_response.dart';
 
+import '../models/api_response.dart';
+import '../models/url.dart';
 import '../providers/product.dart';
-import 'http_service.dart';
+import './auth_service.dart';
+import './http_service.dart';
 
 class ProductService {
-  final HttpService httpService = GetIt.instance.get<HttpService>();
-  static const String relativePath = '/product';
-  final String _baseUrl;
-  String _fullPath;
+  final HttpService httpService;
+  final AuthService authService;
+  static const List<String> relativePath = ['product'];
+  final Url _baseUrl;
 
-  ProductService(this._baseUrl) {
-    _fullPath = _baseUrl + relativePath;
-  }
+  ProductService(this.httpService, this.authService, this._baseUrl);
 
   Product _parseProduct(dynamic item) {
     return Product(
@@ -28,30 +27,77 @@ class ProductService {
     );
   }
 
-  Future<ApiResponse<Product>> add(Product product) async {
+  Future<ApiResponse<Product>> add(
+    Product product,
+  ) async {
+    final Uri uri = Uri(
+      scheme: _baseUrl.scheme,
+      host: _baseUrl.host,
+      port: _baseUrl.port,
+      pathSegments: relativePath,
+    );
     return httpService.request<Product>(
-      request: () => post(_fullPath, body: json.encode(product)),
+      request: () => post(
+        uri,
+        body: json.encode(product),
+        headers: {'Authorization': this.authService.token},
+      ),
       dataParsing: _parseProduct,
     );
   }
 
   Future<ApiResponse<Product>> getAll() async {
+    final Uri uri = Uri(
+      scheme: _baseUrl.scheme,
+      host: _baseUrl.host,
+      port: _baseUrl.port,
+      pathSegments: relativePath,
+    );
     return httpService.request<Product>(
-      request: () => get(_fullPath),
+      request: () => get(
+        uri,
+        headers: {'Authorization': this.authService.token},
+      ),
       dataParsing: _parseProduct,
     );
   }
 
-  Future<ApiResponse<Product>> deleteByID(int id) async {
+  Future<ApiResponse<Product>> deleteByID(
+    int id,
+  ) async {
+    final Uri uri = Uri(
+      scheme: _baseUrl.scheme,
+      host: _baseUrl.host,
+      port: _baseUrl.port,
+      pathSegments: relativePath,
+      queryParameters: {'id': id},
+    );
     return httpService.request<Product>(
-      request: () => delete(_fullPath + '/$id'),
+      request: () => delete(
+        uri,
+        headers: {'Authorization': this.authService.token},
+      ),
       dataParsing: _parseProduct,
     );
   }
 
-  Future<ApiResponse<Product>> updateByID(int id, Product product) async {
+  Future<ApiResponse<Product>> updateByID(
+    int id,
+    Product product,
+  ) async {
+    final Uri uri = Uri(
+      scheme: _baseUrl.scheme,
+      host: _baseUrl.host,
+      port: _baseUrl.port,
+      pathSegments: relativePath,
+      queryParameters: {'id': id.toString()},
+    );
     return httpService.request<Product>(
-      request: () => put(_fullPath + '/$id', body: json.encode(product)),
+      request: () => put(
+        uri,
+        body: json.encode(product),
+        headers: {'Authorization': this.authService.token},
+      ),
       dataParsing: _parseProduct,
     );
   }

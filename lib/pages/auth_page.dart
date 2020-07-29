@@ -10,7 +10,7 @@ class AuthPage extends StatelessWidget {
   final SnackBarService _snackBar = GetIt.instance.get<SnackBarService>();
   static const routeName = '/auth';
 
-  Function _onError(BuildContext context, Exception exception) {
+  _onError(BuildContext context, Exception exception) {
     _snackBar.show(
       context: context,
       message: exception.toString(),
