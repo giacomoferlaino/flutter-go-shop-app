@@ -17,7 +17,7 @@ var userRoutes = struct {
 	FavoriteProduct string
 }{
 	Product:         "product",
-	FavoriteProduct: "favoriteProduct",
+	FavoriteProduct: "product/favorite",
 }
 
 // NewUserHandler returns a new http user handler
@@ -48,7 +48,7 @@ func (handler *UserHandler) ServeHTTP(res http.ResponseWriter, req *http.Request
 		return
 	}
 
-	route := strings.Split(req.URL.Path, "/")[2]
+	route := strings.Join(strings.Split(req.URL.Path, "/")[2:], "/")
 	switch route {
 	case userRoutes.Product:
 		switch req.Method {

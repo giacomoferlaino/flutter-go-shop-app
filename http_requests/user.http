@@ -13,15 +13,15 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNTk2MjMz
 
 ###
 
-GET http://localhost:8080/user/favoriteProduct HTTP/1.1
+GET http://localhost:8080/user/product/favorite HTTP/1.1
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNTk2MjMzMDQzfQ.6p3vUYdWHw1xtch9XDq6nUy6zwQzA_bSpOfDiKuwOys
 
 ###
 
-POST http://localhost:8080/user/favoriteProduct?productId=3 HTTP/1.1
+POST http://localhost:8080/user/product/favorite?productId=3 HTTP/1.1
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNTk2MjMzMDQzfQ.6p3vUYdWHw1xtch9XDq6nUy6zwQzA_bSpOfDiKuwOys
 
 ###
 
-DELETE http://localhost:8080/user/favoriteProduct?productId=3 HTTP/1.1
+DELETE http://localhost:8080/user/product/favorite?productId=3 HTTP/1.1
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNTk2MjMzMDQzfQ.6p3vUYdWHw1xtch9XDq6nUy6zwQzA_bSpOfDiKuwOys
