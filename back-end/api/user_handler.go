@@ -85,7 +85,7 @@ func (handler *UserHandler) GetProducts(res http.ResponseWriter, req *http.Reque
 
 // AddProduct adds a new product to a given user
 func (handler *UserHandler) AddProduct(res http.ResponseWriter, req *http.Request, userID uint) {
-	productID, err := strconv.ParseUint(req.FormValue("productId"), 10, 64)
+	productID, err := strconv.ParseUint(req.FormValue("id"), 10, 64)
 	if err != nil {
 		sendError(res, errors.New("Invalid product id"))
 		return
@@ -100,7 +100,7 @@ func (handler *UserHandler) AddProduct(res http.ResponseWriter, req *http.Reques
 
 // RemoveProduct removes a product from a give user
 func (handler *UserHandler) RemoveProduct(res http.ResponseWriter, req *http.Request, userID uint) {
-	productID, err := strconv.ParseUint(req.FormValue("productId"), 10, 64)
+	productID, err := strconv.ParseUint(req.FormValue("id"), 10, 64)
 	if err != nil {
 		sendError(res, errors.New("Invalid product id"))
 		return
@@ -127,7 +127,7 @@ func (handler *UserHandler) GetFavoriteProducts(res http.ResponseWriter, req *ht
 
 // AddFavoriteProduct adds a new favorite product to a given user
 func (handler *UserHandler) AddFavoriteProduct(res http.ResponseWriter, req *http.Request, userID uint) {
-	productID, err := strconv.ParseUint(req.FormValue("productId"), 10, 64)
+	productID, err := strconv.ParseUint(req.FormValue("id"), 10, 64)
 	if err != nil {
 		sendError(res, errors.New("Invalid product id"))
 		return
@@ -142,7 +142,7 @@ func (handler *UserHandler) AddFavoriteProduct(res http.ResponseWriter, req *htt
 
 // RemoveFavoriteProduct removes a favorite product from a give user
 func (handler *UserHandler) RemoveFavoriteProduct(res http.ResponseWriter, req *http.Request, userID uint) {
-	productID, err := strconv.ParseUint(req.FormValue("productId"), 10, 64)
+	productID, err := strconv.ParseUint(req.FormValue("id"), 10, 64)
 	if err != nil {
 		sendError(res, errors.New("Invalid product id"))
 		return
