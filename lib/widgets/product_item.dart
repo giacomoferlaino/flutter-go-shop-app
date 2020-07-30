@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/cart.dart';
 import '../providers/product.dart';
+import '../providers/products.dart';
 import '../pages/product_detailt_page.dart';
 import '../services/snack_bar_service.dart';
 
@@ -13,6 +14,8 @@ class ProductItem extends StatelessWidget {
     final SnackBarService snackBarService =
         GetIt.instance.get<SnackBarService>();
     final Product product = Provider.of<Product>(context, listen: false);
+    final Products products = Provider.of<Products>(context, listen: false);
+    final bool isFavorite = products.isFavorite(product.id);
     return Container(
       decoration: BoxDecoration(
           border: Border.all(width: 0.5),
@@ -24,11 +27,11 @@ class ProductItem extends StatelessWidget {
             backgroundColor: Colors.black87,
             leading: Consumer<Product>(
               builder: (context, product, _) => IconButton(
-                icon: Icon(product.isFavorite
-                    ? Icons.favorite
-                    : Icons.favorite_border),
+                icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
                 onPressed: () {
-                  product.toggleFavorite();
+                  isFavorite
+                      ? products.removeFavorite(product)
+                      : products.addFavorite(product);
                 },
                 color: Theme.of(context).accentColor,
               ),

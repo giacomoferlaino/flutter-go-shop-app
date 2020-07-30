@@ -8,6 +8,7 @@ import '../models/api_response.dart';
 class Products with ChangeNotifier {
   final ProductService productService = GetIt.instance.get<ProductService>();
   List<Product> _items = [];
+  List<Product> _favoriteItems = [];
 
   Products();
 
@@ -16,7 +17,14 @@ class Products with ChangeNotifier {
   }
 
   List<Product> get favoriteItems {
-    return _items.where((item) => item.isFavorite).toList();
+    return [..._favoriteItems];
+  }
+
+  bool isFavorite(int productId) {
+    for (Product product in _favoriteItems) {
+      if (product.id == productId) return true;
+    }
+    return false;
   }
 
   Product findByID(int id) {
@@ -26,6 +34,8 @@ class Products with ChangeNotifier {
   Future<void> fetchAll() async {
     ApiResponse response = await productService.getAll();
     _items = [...response.data];
+    response = await productService.getFavorites();
+    _favoriteItems = [...response.data];
     notifyListeners();
   }
 
@@ -59,5 +69,17 @@ class Products with ChangeNotifier {
     if (response.meta.rows > 1) {
       await fetchAll();
     }
+  }
+
+  Future<void> addFavorite(Product product) async {
+    await productService.addFavorite(product.id);
+    this._favoriteItems.add(product);
+    notifyListeners();
+  }
+
+  Future<void> removeFavorite(Product product) async {
+    await productService.removeFavorite(product.id);
+    this._favoriteItems.removeWhere((element) => element.id == product.id);
+    notifyListeners();
   }
 }

@@ -26,7 +26,6 @@ class OrderService {
         description: item['product']['description'],
         imageUrl: item['product']['imageUrl'],
         price: item['product']['price'],
-        isFavorite: item['product']['isFavorite'],
         title: item['product']['title'],
       );
       return cartItems.add(CartItem(

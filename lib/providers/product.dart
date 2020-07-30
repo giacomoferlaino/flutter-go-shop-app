@@ -10,7 +10,6 @@ class Product with ChangeNotifier {
   final String description;
   final double price;
   final String imageUrl;
-  bool isFavorite;
 
   Product({
     @required this.id,
@@ -18,7 +17,6 @@ class Product with ChangeNotifier {
     @required this.description,
     @required this.price,
     @required this.imageUrl,
-    this.isFavorite = false,
   });
 
   Product clone({
@@ -27,7 +25,6 @@ class Product with ChangeNotifier {
     String description,
     double price,
     String imageUrl,
-    bool isFavorite,
   }) {
     return Product(
       id: id == null ? this.id : id,
@@ -35,14 +32,7 @@ class Product with ChangeNotifier {
       description: description == null ? this.description : description,
       price: price == null ? this.price : price,
       imageUrl: imageUrl == null ? this.imageUrl : imageUrl,
-      isFavorite: isFavorite == null ? this.isFavorite : isFavorite,
     );
-  }
-
-  void toggleFavorite() async {
-    isFavorite = !isFavorite;
-    await productService.updateByID(this.id, this);
-    notifyListeners();
   }
 
   Map<String, dynamic> toJson() {
@@ -52,7 +42,6 @@ class Product with ChangeNotifier {
       'description': description,
       'price': price,
       'imageUrl': imageUrl,
-      'isFavorite': isFavorite,
     };
   }
 }
