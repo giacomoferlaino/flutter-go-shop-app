@@ -67,7 +67,7 @@ func (handler *AuthHandler) Login(res http.ResponseWriter, req *http.Request) {
 		sendError(res, err)
 		return
 	}
-	data, _, err = handler.store.GetByEmail(loginData.Email)
+	data, _, err = handler.store.GetByEmail(loginData.Email, false)
 	if err != nil {
 		sendError(res, err)
 		return

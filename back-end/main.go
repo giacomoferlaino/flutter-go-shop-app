@@ -25,6 +25,7 @@ func main() {
 	jwtManager := auth.NewJwtManager("secret_key")
 
 	router.Handle("/auth/", api.NewAuthHandler(app, jwtManager))
+	router.Handle("/user/", api.NewUserHandler(app, jwtManager))
 	router.Handle("/product", api.NewProductHandler(app, jwtManager))
 	router.Handle("/order", api.NewOrderHandler(app, jwtManager))
 

@@ -10,9 +10,13 @@ type UserDataStore struct {
 }
 
 // GetAll returns all the saved users
-func (store *UserDataStore) GetAll() (interface{}, int64, error) {
+func (store *UserDataStore) GetAll(preloading bool) (interface{}, int64, error) {
 	users := []User{}
-	connection := store.DB.Find(&users)
+	connection := store.DB
+	if preloading {
+		connection = connection.Preload("Products").Preload("FavoriteProducts")
+	}
+	connection = connection.Find(&users)
 	if connection.Error != nil {
 		return nil, connection.RowsAffected, connection.Error
 	}
@@ -20,9 +24,13 @@ func (store *UserDataStore) GetAll() (interface{}, int64, error) {
 }
 
 // GetByID returns a user based on its ID
-func (store *UserDataStore) GetByID(id uint) (interface{}, int64, error) {
+func (store *UserDataStore) GetByID(id uint, preloading bool) (interface{}, int64, error) {
 	user := User{}
-	connection := store.DB.First(&user, id)
+	connection := store.DB
+	if preloading {
+		connection = connection.Preload("Products").Preload("FavoriteProducts")
+	}
+	connection = connection.First(&user, id)
 	if connection.RecordNotFound() {
 		return nil, connection.RowsAffected, nil
 	}
@@ -33,9 +41,13 @@ func (store *UserDataStore) GetByID(id uint) (interface{}, int64, error) {
 }
 
 // GetByEmail returns a user based on its ID
-func (store *UserDataStore) GetByEmail(email string) (interface{}, int64, error) {
+func (store *UserDataStore) GetByEmail(email string, preloading bool) (interface{}, int64, error) {
 	user := User{}
-	connection := store.DB.Where(&User{Email: email}).First(&user)
+	connection := store.DB
+	if preloading {
+		connection = connection.Preload("Products").Preload("FavoriteProducts")
+	}
+	connection = connection.Where(&User{Email: email}).First(&user)
 	if connection.RecordNotFound() {
 		return nil, connection.RowsAffected, nil
 	}
@@ -75,4 +87,48 @@ func (store *UserDataStore) UpdateByID(id uint, item interface{}) (interface{}, 
 		return nil, connection.RowsAffected, connection.Error
 	}
 	return []User{targetUser}, connection.RowsAffected, nil
+}
+
+// AddProduct adds a new product to a given user
+func (store *UserDataStore) AddProduct(userID uint, productID uint) error {
+	data, _, err := store.GetByID(userID, false)
+	if err != nil {
+		return err
+	}
+	users, _ := data.([]User)
+	connection := store.DB.Model(&users[0]).Association("Products").Append(Product{Model: Model{ID: productID}})
+	return connection.Error
+}
+
+// RemoveProduct removes a product from a given user
+func (store *UserDataStore) RemoveProduct(userID uint, productID uint) error {
+	data, _, err := store.GetByID(userID, false)
+	if err != nil {
+		return err
+	}
+	users, _ := data.([]User)
+	connection := store.DB.Model(&users[0]).Association("Products").Delete(Product{Model: Model{ID: productID}})
+	return connection.Error
+}
+
+// AddFavoriteProduct adds a new product to a given user
+func (store *UserDataStore) AddFavoriteProduct(userID uint, productID uint) error {
+	data, _, err := store.GetByID(userID, false)
+	if err != nil {
+		return err
+	}
+	users, _ := data.([]User)
+	connection := store.DB.Model(&users[0]).Association("FavoriteProducts").Append(Product{Model: Model{ID: productID}})
+	return connection.Error
+}
+
+// RemoveFavoriteProduct removes a product from a given user
+func (store *UserDataStore) RemoveFavoriteProduct(userID uint, productID uint) error {
+	data, _, err := store.GetByID(userID, false)
+	if err != nil {
+		return err
+	}
+	users, _ := data.([]User)
+	connection := store.DB.Model(&users[0]).Association("FavoriteProducts").Delete(Product{Model: Model{ID: productID}})
+	return connection.Error
 }
