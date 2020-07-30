@@ -18,11 +18,11 @@ var authRoutes = struct {
 }
 
 // NewAuthHandler returns a new http authentication handler
-func NewAuthHandler(app app.State) *AuthHandler {
+func NewAuthHandler(app app.State, jwtManager *auth.JwtManager) *AuthHandler {
 	return &AuthHandler{
 		app:        app,
 		store:      &orm.UserDataStore{DB: app.Database},
-		jwtManager: auth.NewJwtManager("secret_key"),
+		jwtManager: jwtManager,
 	}
 }
 
@@ -78,7 +78,7 @@ func (handler *AuthHandler) Login(res http.ResponseWriter, req *http.Request) {
 		sendError(res, err)
 		return
 	}
-	token, err := handler.jwtManager.CreateToken()
+	token, err := handler.jwtManager.CreateToken(users[0].ID)
 	if err != nil {
 		sendError(res, err)
 		return

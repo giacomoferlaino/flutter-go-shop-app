@@ -4,23 +4,26 @@ import (
 	"errors"
 	"flutter_shop_app/api/method"
 	"flutter_shop_app/app"
+	"flutter_shop_app/auth"
 	"flutter_shop_app/orm"
 	"io"
 	"net/http"
 )
 
 // NewOrderHandler returns a new http order handler
-func NewOrderHandler(app app.State) *OrderHandler {
+func NewOrderHandler(app app.State, jwtManager *auth.JwtManager) *OrderHandler {
 	return &OrderHandler{
-		app:   app,
-		store: &orm.OrderDataStore{DB: app.Database},
+		app:        app,
+		store:      &orm.OrderDataStore{DB: app.Database},
+		jwtManager: jwtManager,
 	}
 }
 
 // OrderHandler manages HTTP requests for order APIs
 type OrderHandler struct {
-	app   app.State
-	store *orm.OrderDataStore
+	app        app.State
+	store      *orm.OrderDataStore
+	jwtManager *auth.JwtManager
 }
 
 func (handler *OrderHandler) parseJSON(reqBody io.ReadCloser) (interface{}, error) {
@@ -29,6 +32,10 @@ func (handler *OrderHandler) parseJSON(reqBody io.ReadCloser) (interface{}, erro
 
 // ServeHTTP implements the http.Handler interface
 func (handler *OrderHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	if _, err := authenticate(req, handler.jwtManager); err != nil {
+		sendError(res, err)
+		return
+	}
 	crudHandler := HTTPCRUDHandler{app: handler.app, store: handler.store, parseJSON: handler.parseJSON}
 	switch req.Method {
 	case method.GET:

@@ -2,25 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
-	"net/http"
 )
-
-func sendError(res http.ResponseWriter, err error) {
-	res.WriteHeader(http.StatusInternalServerError)
-	fmt.Fprint(res, NewErrorResponse(err.Error()).ToJSON())
-	return
-}
-
-func sendSuccess(res http.ResponseWriter, data interface{}, rowsAffected int64) {
-	apiResponse, err := json.Marshal(NewSuccessResponse(data, rowsAffected))
-	if err != nil {
-		sendError(res, err)
-		return
-	}
-	res.WriteHeader(http.StatusOK)
-	fmt.Fprintln(res, string(apiResponse))
-}
 
 // NewSuccessResponse return a new http success response
 func NewSuccessResponse(data interface{}, rows int64) *Response {
