@@ -95,7 +95,7 @@ func (handler *UserHandler) AddProduct(res http.ResponseWriter, req *http.Reques
 		sendError(res, err)
 		return
 	}
-	sendSuccess(res, []struct{}{}, 0)
+	sendSuccess(res, []struct{}{}, 1)
 }
 
 // RemoveProduct removes a product from a give user
@@ -110,7 +110,7 @@ func (handler *UserHandler) RemoveProduct(res http.ResponseWriter, req *http.Req
 		sendError(res, err)
 		return
 	}
-	sendSuccess(res, []struct{}{}, 0)
+	sendSuccess(res, []struct{}{}, 1)
 }
 
 // GetFavoriteProducts reads all the product related to a specific user
@@ -137,7 +137,7 @@ func (handler *UserHandler) AddFavoriteProduct(res http.ResponseWriter, req *htt
 		sendError(res, err)
 		return
 	}
-	sendSuccess(res, []struct{}{}, 0)
+	sendSuccess(res, []struct{}{}, 1)
 }
 
 // RemoveFavoriteProduct removes a favorite product from a give user
@@ -152,5 +152,5 @@ func (handler *UserHandler) RemoveFavoriteProduct(res http.ResponseWriter, req *
 		sendError(res, err)
 		return
 	}
-	sendSuccess(res, []struct{}{}, 0)
+	sendSuccess(res, []struct{}{}, 1)
 }
