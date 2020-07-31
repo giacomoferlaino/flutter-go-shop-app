@@ -30,6 +30,10 @@ class AuthService {
     return null;
   }
 
+  DateTime get expirationDate {
+    return this._expirationDate;
+  }
+
   void registerToken(String token, DateTime expirationDate) {
     this._token = token;
     this._expirationDate = expirationDate;
