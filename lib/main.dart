@@ -15,6 +15,7 @@ import './pages/product_detailt_page.dart';
 import './pages/user_products_page.dart';
 import './pages/edit_product_page.dart';
 import './pages/auth_page.dart';
+import './pages/splash_page.dart';
 import './services/product_service.dart';
 import './services/snack_bar_service.dart';
 import './services/order_service.dart';
@@ -62,6 +63,19 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  Widget getHomePage(AuthService authService, Auth auth) {
+    if (authService.isAuth) return ProductsOverviewPage();
+    return FutureBuilder(
+      future: auth.authLogin(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return SplashPage();
+        }
+        return AuthPage();
+      },
+    );
+  }
+
   final AuthService authService = GetIt.instance.get<AuthService>();
   @override
   Widget build(BuildContext context) {
@@ -92,7 +106,7 @@ class MyApp extends StatelessWidget {
             errorColor: Color.fromRGBO(191, 1, 1, 0.7),
             fontFamily: 'Lato',
           ),
-          home: authService.isAuth ? ProductsOverviewPage() : AuthPage(),
+          home: getHomePage(authService, auth),
           routes: {
             AuthPage.routeName: (context) => AuthPage(),
             ProductsOverviewPage.routeName: (context) => ProductsOverviewPage(),
