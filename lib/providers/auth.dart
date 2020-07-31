@@ -30,4 +30,9 @@ class Auth with ChangeNotifier {
     this.authService.registerToken(sessionData.idToken, expirationDate);
     notifyListeners();
   }
+
+  void logout() {
+    this.authService.logout();
+    notifyListeners();
+  }
 }

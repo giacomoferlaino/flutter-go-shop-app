@@ -76,4 +76,9 @@ class AuthService {
       dataParsing: _parseSessionData,
     );
   }
+
+  void logout() {
+    this._token = null;
+    this._expirationDate = null;
+  }
 }
