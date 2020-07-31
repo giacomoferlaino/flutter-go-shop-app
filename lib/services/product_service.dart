@@ -51,15 +51,16 @@ class ProductService {
       host: _baseUrl.host,
       port: _baseUrl.port,
       pathSegments: userProductsPath,
-      queryParameters: {'id': newProduct.id},
+      queryParameters: {'id': newProduct.id.toString()},
     );
-    return httpService.request<Product>(
+    await httpService.request<Product>(
       request: () => post(
         uri,
         headers: {'Authorization': this.authService.token},
       ),
       dataParsing: _parseProduct,
     );
+    return apiResponse;
   }
 
   Future<ApiResponse<Product>> getAll() async {
@@ -102,7 +103,7 @@ class ProductService {
       host: _baseUrl.host,
       port: _baseUrl.port,
       pathSegments: userProductsPath,
-      queryParameters: {'id': id},
+      queryParameters: {'id': id.toString()},
     );
     return httpService.request<Product>(
       request: () => delete(
