@@ -1,20 +1,21 @@
 GET http://localhost:8080/order HTTP/1.1
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNTk2NTM0NTM2fQ.wAs7EtaagcAWLfOY_gumZ_MaQuFilPtAUGtZyqStYLk
 
 ###
 
 POST http://localhost:8080/order HTTP/1.1
 Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNTk2NTM0NTM2fQ.wAs7EtaagcAWLfOY_gumZ_MaQuFilPtAUGtZyqStYLk
 
 {
-  "amount": "9.99",
+  "amount": 9.99,
   "cartItems": [{
     "product": {
-    "id": 5,
-    "title": "New product",
-    "description": "new amazing product",
-    "price": 9.99,
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTSLl_X5xNhD3U5GmU1ZTcy0HhMA5Kv3dnZ9XPSXTI28Q8XWWiVbfhBvM6Ri2PDpMYzpPLzVxE&usqp=CAc",
-    "isFavorite": false
+      "id": 5,
+      "title": "Black vest",
+      "description": "new amazing product",
+      "price": 9.99,
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTSLl_X5xNhD3U5GmU1ZTcy0HhMA5Kv3dnZ9XPSXTI28Q8XWWiVbfhBvM6Ri2PDpMYzpPLzVxE\u0026usqp=CAc"
     },
     "quantity": 1
   }],
@@ -24,11 +25,13 @@ Content-Type: application/json
 ###
 
 GET http://localhost:8080/order?id=11 HTTP/1.1
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNTk2NTM0NTM2fQ.wAs7EtaagcAWLfOY_gumZ_MaQuFilPtAUGtZyqStYLk
 
 ###
 
 PUT http://localhost:8080/order?id=10 HTTP/1.1
 Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNTk2NTM0NTM2fQ.wAs7EtaagcAWLfOY_gumZ_MaQuFilPtAUGtZyqStYLk
 
 {
   "amount": "19.99",
@@ -47,3 +50,4 @@ Content-Type: application/json
 ###
 
 DELETE http://localhost:8080/order?id=16 HTTP/1.1
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNTk2NTM0NTM2fQ.wAs7EtaagcAWLfOY_gumZ_MaQuFilPtAUGtZyqStYLk
