@@ -15,9 +15,11 @@ import (
 var userRoutes = struct {
 	Product         string
 	FavoriteProduct string
+	Order           string
 }{
 	Product:         "product",
 	FavoriteProduct: "product/favorite",
+	Order:           "order",
 }
 
 // NewUserHandler returns a new http user handler
@@ -36,8 +38,12 @@ type UserHandler struct {
 	jwtManager *auth.JwtManager
 }
 
-func (handler *UserHandler) parseJSON(reqBody io.ReadCloser) (interface{}, error) {
+func (handler *UserHandler) parseProduct(reqBody io.ReadCloser) (interface{}, error) {
 	return ParseJSON(reqBody, &orm.Product{})
+}
+
+func (handler *UserHandler) parseOrder(reqBody io.ReadCloser) (interface{}, error) {
+	return ParseJSON(reqBody, &orm.Order{})
 }
 
 // ServeHTTP implements the http.Handler interface
@@ -68,6 +74,13 @@ func (handler *UserHandler) ServeHTTP(res http.ResponseWriter, req *http.Request
 		case method.DELETE:
 			handler.RemoveFavoriteProduct(res, req, userID)
 		}
+	case userRoutes.Order:
+		switch req.Method {
+		case method.GET:
+			handler.GetOrders(res, req, userID)
+		case method.POST:
+			handler.AddOrder(res, req, userID)
+		}
 	}
 }
 
@@ -85,17 +98,17 @@ func (handler *UserHandler) GetProducts(res http.ResponseWriter, req *http.Reque
 
 // AddProduct adds a new product to a given user
 func (handler *UserHandler) AddProduct(res http.ResponseWriter, req *http.Request, userID uint) {
-	productID, err := strconv.ParseUint(req.FormValue("id"), 10, 64)
-	if err != nil {
-		sendError(res, errors.New("Invalid product id"))
-		return
+	data, err := handler.parseProduct(req.Body)
+	newProduct, ok := data.(*orm.Product)
+	if err != nil || !ok {
+		sendError(res, errors.New("Invalid product"))
 	}
-	err = handler.store.AddProduct(userID, uint(productID))
+	createdProduct, err := handler.store.AddProduct(userID, *newProduct)
 	if err != nil {
 		sendError(res, err)
 		return
 	}
-	sendSuccess(res, []struct{}{}, 1)
+	sendSuccess(res, []orm.Product{*createdProduct}, 1)
 }
 
 // RemoveProduct removes a product from a give user
@@ -153,4 +166,28 @@ func (handler *UserHandler) RemoveFavoriteProduct(res http.ResponseWriter, req *
 		return
 	}
 	sendSuccess(res, []struct{}{}, 1)
+}
+
+// GetOrders returns a list of orders for a given user
+func (handler *UserHandler) GetOrders(res http.ResponseWriter, req *http.Request, userID uint) {
+	orders, err := handler.store.GetOrders(userID)
+	if err != nil {
+		sendError(res, err)
+	}
+	sendSuccess(res, orders, 1)
+}
+
+// AddOrder adds a new order for a given user
+func (handler *UserHandler) AddOrder(res http.ResponseWriter, req *http.Request, userID uint) {
+	data, err := handler.parseOrder(req.Body)
+	newOrder, ok := data.(*orm.Order)
+	if err != nil || !ok {
+		sendError(res, errors.New("Invalid order"))
+		return
+	}
+	createdOrder, err := handler.store.AddOrder(userID, *newOrder)
+	if err != nil {
+		sendError(res, err)
+	}
+	sendSuccess(res, []orm.Order{*createdOrder}, 1)
 }
