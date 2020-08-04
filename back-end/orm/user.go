@@ -9,4 +9,5 @@ type User struct {
 	Password         string    `json:"password"`
 	Products         []Product `json:"products" gorm:"many2many:users_products"`
 	FavoriteProducts []Product `json:"favoriteProducts" gorm:"many2many:users_favoriteProducts"`
+	Orders           []Order   `json:"orders"`
 }
