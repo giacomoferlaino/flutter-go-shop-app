@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shop_app/services/user_service.dart';
 
 import './models/url.dart';
 import './providers/cart.dart';
@@ -43,6 +44,11 @@ final orderService = OrderService(
   authService,
   baseUrl,
 );
+final userService = UserService(
+  httpService,
+  authService,
+  baseUrl,
+);
 
 void serviceLocatorSetup() {
   GetIt serviceLocator = GetIt.instance;
@@ -50,6 +56,7 @@ void serviceLocatorSetup() {
   serviceLocator.registerSingleton<HttpService>(httpService);
   serviceLocator.registerSingleton<ProductService>(productService);
   serviceLocator.registerSingleton<OrderService>(orderService);
+  serviceLocator.registerSingleton<UserService>(userService);
   serviceLocator.registerSingleton<SnackBarService>(
     SnackBarService(
       duration: Duration(seconds: 2),
