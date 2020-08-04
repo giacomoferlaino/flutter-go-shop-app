@@ -11,14 +11,13 @@ import './http_service.dart';
 class ProductService {
   final HttpService httpService;
   final AuthService authService;
-  static const List<String> userProductsPath = ['user', 'product'];
-  static const List<String> userFavoritesPath = ['user', 'product', 'favorite'];
-  static const List<String> globalProductsPath = ['product'];
+
+  static const List<String> productPath = ['product'];
   final Url _baseUrl;
 
   ProductService(this.httpService, this.authService, this._baseUrl);
 
-  Product _parseProduct(dynamic item) {
+  static Product parseProduct(dynamic item) {
     return Product(
       id: item['id'],
       description: item['description'],
@@ -35,32 +34,16 @@ class ProductService {
       scheme: _baseUrl.scheme,
       host: _baseUrl.host,
       port: _baseUrl.port,
-      pathSegments: globalProductsPath,
+      pathSegments: productPath,
     );
-    ApiResponse apiResponse = await httpService.request<Product>(
+    return await httpService.request<Product>(
       request: () => post(
         uri,
         body: json.encode(product),
         headers: {'Authorization': this.authService.token},
       ),
-      dataParsing: _parseProduct,
+      dataParsing: parseProduct,
     );
-    Product newProduct = apiResponse.data[0];
-    uri = Uri(
-      scheme: _baseUrl.scheme,
-      host: _baseUrl.host,
-      port: _baseUrl.port,
-      pathSegments: userProductsPath,
-      queryParameters: {'id': newProduct.id.toString()},
-    );
-    await httpService.request<Product>(
-      request: () => post(
-        uri,
-        headers: {'Authorization': this.authService.token},
-      ),
-      dataParsing: _parseProduct,
-    );
-    return apiResponse;
   }
 
   Future<ApiResponse<Product>> getAll() async {
@@ -68,30 +51,14 @@ class ProductService {
       scheme: _baseUrl.scheme,
       host: _baseUrl.host,
       port: _baseUrl.port,
-      pathSegments: userProductsPath,
+      pathSegments: productPath,
     );
     return httpService.request<Product>(
       request: () => get(
         uri,
         headers: {'Authorization': this.authService.token},
       ),
-      dataParsing: _parseProduct,
-    );
-  }
-
-  Future<ApiResponse<Product>> getFavorites() async {
-    final Uri uri = Uri(
-      scheme: _baseUrl.scheme,
-      host: _baseUrl.host,
-      port: _baseUrl.port,
-      pathSegments: userFavoritesPath,
-    );
-    return httpService.request<Product>(
-      request: () => get(
-        uri,
-        headers: {'Authorization': this.authService.token},
-      ),
-      dataParsing: _parseProduct,
+      dataParsing: parseProduct,
     );
   }
 
@@ -102,7 +69,7 @@ class ProductService {
       scheme: _baseUrl.scheme,
       host: _baseUrl.host,
       port: _baseUrl.port,
-      pathSegments: userProductsPath,
+      pathSegments: productPath,
       queryParameters: {'id': id.toString()},
     );
     return httpService.request<Product>(
@@ -110,7 +77,7 @@ class ProductService {
         uri,
         headers: {'Authorization': this.authService.token},
       ),
-      dataParsing: _parseProduct,
+      dataParsing: parseProduct,
     );
   }
 
@@ -122,7 +89,7 @@ class ProductService {
       scheme: _baseUrl.scheme,
       host: _baseUrl.host,
       port: _baseUrl.port,
-      pathSegments: globalProductsPath,
+      pathSegments: productPath,
       queryParameters: {'id': id.toString()},
     );
     return httpService.request<Product>(
@@ -131,45 +98,7 @@ class ProductService {
         body: json.encode(product),
         headers: {'Authorization': this.authService.token},
       ),
-      dataParsing: _parseProduct,
-    );
-  }
-
-  Future<ApiResponse<Product>> addFavorite(
-    int id,
-  ) async {
-    final Uri uri = Uri(
-      scheme: _baseUrl.scheme,
-      host: _baseUrl.host,
-      port: _baseUrl.port,
-      pathSegments: userFavoritesPath,
-      queryParameters: {'id': id.toString()},
-    );
-    return httpService.request<Product>(
-      request: () => post(
-        uri,
-        headers: {'Authorization': this.authService.token},
-      ),
-      dataParsing: _parseProduct,
-    );
-  }
-
-  Future<ApiResponse<Product>> removeFavorite(
-    int id,
-  ) async {
-    final Uri uri = Uri(
-      scheme: _baseUrl.scheme,
-      host: _baseUrl.host,
-      port: _baseUrl.port,
-      pathSegments: userFavoritesPath,
-      queryParameters: {'id': id.toString()},
-    );
-    return httpService.request<Product>(
-      request: () => delete(
-        uri,
-        headers: {'Authorization': this.authService.token},
-      ),
-      dataParsing: _parseProduct,
+      dataParsing: parseProduct,
     );
   }
 }

@@ -5,9 +5,11 @@ import '../models/order_item.dart';
 import '../models/cart_item.dart';
 import '../models/api_response.dart';
 import '../services/order_service.dart';
+import '../services/user_service.dart';
 
 class Orders with ChangeNotifier {
   final OrderService orderService = GetIt.instance.get<OrderService>();
+  final UserService userService = GetIt.instance.get<UserService>();
   List<OrderItem> _items = [];
 
   List<OrderItem> get items {
@@ -15,7 +17,7 @@ class Orders with ChangeNotifier {
   }
 
   Future<void> fetchAll() async {
-    ApiResponse response = await orderService.getAll();
+    ApiResponse response = await userService.getOrders();
     _items = response.data.reversed.toList();
     notifyListeners();
   }
@@ -27,7 +29,7 @@ class Orders with ChangeNotifier {
       dateTime: DateTime.now(),
       cartItems: cartProducts,
     );
-    ApiResponse response = await orderService.add(order);
+    ApiResponse response = await userService.addOrder(order);
     OrderItem createdOrder = response.data[0];
     OrderItem newOrder = order.clone(id: createdOrder.id);
     _items.insert(0, newOrder);

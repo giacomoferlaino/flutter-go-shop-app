@@ -3,11 +3,14 @@ import 'package:get_it/get_it.dart';
 
 import './product.dart';
 import '../services/product_service.dart';
+import '../services/user_service.dart';
 import '../models/api_response.dart';
 
 class Products with ChangeNotifier {
   final ProductService productService = GetIt.instance.get<ProductService>();
+  final UserService userService = GetIt.instance.get<UserService>();
   List<Product> _items = [];
+  List<Product> _ownedItems = [];
   List<Product> _favoriteItems = [];
 
   Products();
@@ -18,6 +21,10 @@ class Products with ChangeNotifier {
 
   List<Product> get favoriteItems {
     return [..._favoriteItems];
+  }
+
+  List<Product> get ownedItems {
+    return [..._ownedItems];
   }
 
   bool isFavorite(int productId) {
@@ -34,52 +41,35 @@ class Products with ChangeNotifier {
   Future<void> fetchAll() async {
     ApiResponse response = await productService.getAll();
     _items = [...response.data];
-    response = await productService.getFavorites();
+    response = await userService.getFavoriteProducts();
     _favoriteItems = [...response.data];
+    response = await userService.getProducts();
+    _ownedItems = [...response.data];
     notifyListeners();
   }
 
   Future<void> add(Product product) async {
-    ApiResponse response = await productService.add(product);
-    Product createdProduct = response.data[0];
-    final newProduct = product.clone(id: createdProduct.id);
-    _items.insert(0, newProduct);
-    notifyListeners();
+    await userService.addProduct(product);
+    fetchAll();
   }
 
   Future<void> updateByID(int id, Product product) async {
-    ApiResponse response = await productService.updateByID(id, product);
-    if (response.meta.rows == 1) {
-      final int prodIndex = _items.indexWhere((product) => product.id == id);
-      if (prodIndex < 0) return;
-      _items[prodIndex] = product;
-      notifyListeners();
-    }
-    if (response.meta.rows > 1) {
-      await fetchAll();
-    }
+    await productService.updateByID(id, product);
+    await fetchAll();
   }
 
   Future<void> deleteByID(int id) async {
-    ApiResponse response = await productService.deleteByID(id);
-    if (response.meta.rows == 1) {
-      _items.removeWhere((product) => product.id == id);
-      notifyListeners();
-    }
-    if (response.meta.rows > 1) {
-      await fetchAll();
-    }
+    await productService.deleteByID(id);
+    await fetchAll();
   }
 
   Future<void> addFavorite(Product product) async {
-    await productService.addFavorite(product.id);
-    this._favoriteItems.add(product);
-    notifyListeners();
+    await userService.addFavoriteProduct(product.id);
+    fetchAll();
   }
 
   Future<void> removeFavorite(Product product) async {
-    await productService.removeFavorite(product.id);
-    this._favoriteItems.removeWhere((element) => element.id == product.id);
-    notifyListeners();
+    await userService.removeFavoriteProduct(product.id);
+    fetchAll();
   }
 }

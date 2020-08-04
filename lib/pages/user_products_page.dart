@@ -32,8 +32,9 @@ class UserProductsPage extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(8),
           child: ListView.builder(
-            itemCount: products.items.length,
-            itemBuilder: (_, index) => UserProductItem(products.items[index]),
+            itemCount: products.ownedItems.length,
+            itemBuilder: (_, index) =>
+                UserProductItem(products.ownedItems[index]),
           ),
         ),
       ),

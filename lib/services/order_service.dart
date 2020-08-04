@@ -11,28 +11,30 @@ import './auth_service.dart';
 import './http_service.dart';
 
 class OrderService {
-  final HttpService httpService;
-  final AuthService authService;
-  static const String relativePath = '/order';
+  final HttpService _httpService;
+  final AuthService _authService;
+  static const List<String> _orderPath = ['order'];
   final Url _baseUrl;
 
-  OrderService(this.httpService, this.authService, this._baseUrl);
+  OrderService(this._httpService, this._authService, this._baseUrl);
 
-  OrderItem _parseOrder(dynamic item) {
+  static OrderItem parseOrder(dynamic item) {
     final List<CartItem> cartItems = [];
-    item['cartItems'].forEach((item) {
-      Product product = Product(
-        id: item['product']['id'],
-        description: item['product']['description'],
-        imageUrl: item['product']['imageUrl'],
-        price: item['product']['price'],
-        title: item['product']['title'],
-      );
-      return cartItems.add(CartItem(
-        product: product,
-        quantity: item['quantity'],
-      ));
-    });
+    if (item['cartItems'] != null) {
+      item['cartItems'].forEach((item) {
+        Product product = Product(
+          id: item['product']['id'],
+          description: item['product']['description'],
+          imageUrl: item['product']['imageUrl'],
+          price: item['product']['price'],
+          title: item['product']['title'],
+        );
+        return cartItems.add(CartItem(
+          product: product,
+          quantity: item['quantity'],
+        ));
+      });
+    }
     return OrderItem(
       id: item['id'],
       amount: item['amount'],
@@ -48,15 +50,15 @@ class OrderService {
       scheme: _baseUrl.scheme,
       host: _baseUrl.host,
       port: _baseUrl.port,
-      path: relativePath,
+      pathSegments: _orderPath,
     );
-    return httpService.request(
+    return _httpService.request(
       request: () => post(
         uri,
         body: json.encode(order),
-        headers: {'Authorization': this.authService.token},
+        headers: {'Authorization': this._authService.token},
       ),
-      dataParsing: _parseOrder,
+      dataParsing: parseOrder,
     );
   }
 
@@ -65,14 +67,14 @@ class OrderService {
       scheme: _baseUrl.scheme,
       host: _baseUrl.host,
       port: _baseUrl.port,
-      path: relativePath,
+      pathSegments: _orderPath,
     );
-    return httpService.request(
+    return _httpService.request(
       request: () => get(
         uri,
-        headers: {'Authorization': this.authService.token},
+        headers: {'Authorization': this._authService.token},
       ),
-      dataParsing: _parseOrder,
+      dataParsing: parseOrder,
     );
   }
 
@@ -83,15 +85,15 @@ class OrderService {
       scheme: _baseUrl.scheme,
       host: _baseUrl.host,
       port: _baseUrl.port,
-      path: relativePath,
+      pathSegments: _orderPath,
       queryParameters: {'id': id},
     );
-    return httpService.request(
+    return _httpService.request(
         request: () => delete(
               uri,
-              headers: {'Authorization': this.authService.token},
+              headers: {'Authorization': this._authService.token},
             ),
-        dataParsing: _parseOrder);
+        dataParsing: parseOrder);
   }
 
   Future<ApiResponse<OrderItem>> updateByID(
@@ -102,16 +104,16 @@ class OrderService {
       scheme: _baseUrl.scheme,
       host: _baseUrl.host,
       port: _baseUrl.port,
-      path: relativePath,
+      pathSegments: _orderPath,
       queryParameters: {'id': id},
     );
-    return httpService.request(
+    return _httpService.request(
       request: () => put(
         uri,
         body: json.encode(product),
-        headers: {'Authorization': this.authService.token},
+        headers: {'Authorization': this._authService.token},
       ),
-      dataParsing: _parseOrder,
+      dataParsing: parseOrder,
     );
   }
 }
