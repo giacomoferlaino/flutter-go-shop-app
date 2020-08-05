@@ -71,9 +71,11 @@ void main() {
 
 class MyApp extends StatelessWidget {
   Widget getHomePage(AuthService authService, Auth auth) {
-    if (authService.isAuth) return ProductsOverviewPage();
+    if (authService.isAuth) {
+      return ProductsOverviewPage();
+    }
     return FutureBuilder(
-      future: auth.authLogin(),
+      future: auth.autoLogin(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return SplashPage();

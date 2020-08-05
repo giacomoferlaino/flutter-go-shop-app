@@ -7,7 +7,7 @@ class ActiveSession {
   ActiveSession(this._token, this._expirationDate);
 
   ActiveSession.parse(String jsonText) {
-    Map<String, String> parsedJson = json.decode(jsonText);
+    Map<String, dynamic> parsedJson = json.decode(jsonText);
     this._token = parsedJson['token'];
     this._expirationDate = parsedJson['expirationDate'] != null
         ? DateTime.parse(parsedJson['expirationDate'])
@@ -23,9 +23,13 @@ class ActiveSession {
   }
 
   String toString() {
-    return json.encode({
-      token: token,
-      expirationDate: expirationDate.toString(),
-    });
+    return json.encode(this.toJson());
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'token': token,
+      'expirationDate': expirationDate.toString(),
+    };
   }
 }

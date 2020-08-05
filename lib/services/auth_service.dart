@@ -2,41 +2,42 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 
+import '../services/http_service.dart';
 import '../models/session_data.dart';
 import '../models/api_response.dart';
 import '../models/auth_data.dart';
 import '../models/url.dart';
-import '../services/http_service.dart';
+import '../models/active_session.dart';
 
 class AuthService {
   final HttpService httpService;
   static const String relativePath = '/auth';
   final Url _baseUrl;
-  String _token;
-  DateTime _expirationDate;
+  ActiveSession activeSession;
 
-  AuthService(this.httpService, this._baseUrl);
+  AuthService(this.httpService, this._baseUrl) {
+    this.activeSession = ActiveSession(null, null);
+  }
 
   bool get isAuth {
     return token != null;
   }
 
   String get token {
-    if (_expirationDate != null &&
-        _expirationDate.isAfter(DateTime.now()) &&
-        _token != null) {
-      return _token;
+    if (activeSession.expirationDate != null &&
+        activeSession.expirationDate.isAfter(DateTime.now()) &&
+        activeSession.token != null) {
+      return activeSession.token;
     }
     return null;
   }
 
   DateTime get expirationDate {
-    return this._expirationDate;
+    return this.activeSession.expirationDate;
   }
 
   void registerToken(String token, DateTime expirationDate) {
-    this._token = token;
-    this._expirationDate = expirationDate;
+    this.activeSession = ActiveSession(token, expirationDate);
   }
 
   SessionData _parseSessionData(dynamic item) {
@@ -82,7 +83,6 @@ class AuthService {
   }
 
   void logout() {
-    this._token = null;
-    this._expirationDate = null;
+    this.activeSession = ActiveSession(null, null);
   }
 }

@@ -5,10 +5,11 @@ import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../models/auth_data.dart';
 import '../services/auth_service.dart';
+import '../models/auth_data.dart';
 import '../models/api_response.dart';
 import '../models/session_data.dart';
+import '../models/active_session.dart';
 
 class Auth with ChangeNotifier {
   final AuthService authService = GetIt.instance.get<AuthService>();
@@ -21,7 +22,7 @@ class Auth with ChangeNotifier {
     final DateTime expirationDate = DateTime.now().add(
       Duration(seconds: sessionData.expiresIn),
     );
-    this.authService.registerToken(sessionData.idToken, expirationDate);
+    authService.registerToken(sessionData.idToken, expirationDate);
     notifyListeners();
   }
 
@@ -32,49 +33,45 @@ class Auth with ChangeNotifier {
     final DateTime expirationDate = DateTime.now().add(
       Duration(seconds: sessionData.expiresIn),
     );
-    this.authService.registerToken(sessionData.idToken, expirationDate);
+    authService.registerToken(sessionData.idToken, expirationDate);
     _autoLogout();
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    final userData = json.encode({
-      'token': this.authService.token,
-      'expirationDate': this.authService.expirationDate.toString()
-    });
-    prefs.setString('userData', userData);
+    prefs.setString('activeSession', authService.activeSession.toString());
   }
 
-  Future<bool> authLogin() async {
+  Future<bool> autoLogin() async {
     final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('userData')) {
+    if (!prefs.containsKey('activeSession')) {
       return false;
     }
-    final userData =
-        json.decode(prefs.getString('userData')) as Map<String, Object>;
-    final expiryDate = DateTime.parse(userData['expirationDate']);
-    if (expiryDate.isBefore(DateTime.now())) {
+    final ActiveSession activeSession =
+        ActiveSession.parse(prefs.getString('activeSession'));
+    if (activeSession.expirationDate.isBefore(DateTime.now())) {
       return false;
     }
-    this.authService.registerToken(userData['token'], expiryDate);
+    authService.registerToken(
+        activeSession.token, activeSession.expirationDate);
     notifyListeners();
     _autoLogout();
     return true;
   }
 
   Future<void> logout() async {
-    this.authService.logout();
+    authService.logout();
     if (_authTimer != null) {
       _authTimer.cancel();
       _authTimer = null;
     }
     final prefs = await SharedPreferences.getInstance();
-    prefs.remove('userData');
+    await prefs.remove('activeSession');
     notifyListeners();
   }
 
   void _autoLogout() {
     if (_authTimer != null) _authTimer.cancel();
     final timeOfExpiry =
-        this.authService.expirationDate.difference(DateTime.now()).inSeconds;
+        authService.expirationDate.difference(DateTime.now()).inSeconds;
     _authTimer = Timer(Duration(seconds: timeOfExpiry), logout);
   }
 }
