@@ -65,8 +65,9 @@ class ProductItem extends StatelessWidget {
               Navigator.of(context).pushNamed(ProductDetailPage.routeName,
                   arguments: product.id);
             },
-            child: Image.network(
-              product.imageUrl,
+            child: FadeInImage(
+              placeholder: AssetImage('assets/images/product-placeholder.png'),
+              image: NetworkImage(product.imageUrl),
               fit: BoxFit.cover,
             ),
           ),
