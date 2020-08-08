@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shop_app/helpers/custom_route.dart';
 import 'package:shop_app/services/user_service.dart';
 
 import './models/url.dart';
@@ -114,6 +115,10 @@ class MyApp extends StatelessWidget {
             accentColor: Colors.deepOrange,
             errorColor: Color.fromRGBO(191, 1, 1, 0.7),
             fontFamily: 'Lato',
+            pageTransitionsTheme: PageTransitionsTheme(builders: {
+              TargetPlatform.android: CustomPageTransitionBuilder(),
+              TargetPlatform.iOS: CustomPageTransitionBuilder(),
+            }),
           ),
           home: getHomePage(authService, auth),
           routes: {
